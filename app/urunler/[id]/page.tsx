@@ -17,10 +17,23 @@ export default function ManagedProductPage() {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    const load = () => setProduct(readAdminProducts().find((item) => item.id === params.id) || null);
+    let cancelled = false;
+    async function load() {
+      try {
+        const response = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Ürün verisi alınamadı.");
+        const products = (await response.json()) as AdminProduct[];
+        const found = products.find((item) => item.id === params.id) || null;
+        if (!cancelled) setProduct(found);
+      } catch {
+        const fallback = readAdminProducts().find((item) => item.id === params.id) || null;
+        if (!cancelled) setProduct(fallback);
+      }
+    }
     load();
-    window.addEventListener("3dbade-products-updated", load);
-    return () => window.removeEventListener("3dbade-products-updated", load);
+    return () => {
+      cancelled = true;
+    };
   }, [params.id]);
 
   const images = useMemo(() => product ? [product.mainImage, ...product.hoverImages].filter(Boolean) : [], [product]);
@@ -39,7 +52,7 @@ export default function ManagedProductPage() {
       <div className="product-breadcrumb"><Link href="/">Ana Sayfa</Link><span>›</span><Link href="/magaza">{product.category}</Link><span>›</span><b>{product.title}</b></div>
       <section className="product-main">
         <div className="product-gallery">
-          <div className="product-thumbnails">{images.map((image, index) => <button key={image} className={imageIndex === index ? "selected" : ""} onClick={() => setImageIndex(index)} aria-label={`${index + 1}. görseli göster`}><img src={image} alt="" /></button>)}</div>
+          <div className="product-thumbnails">{images.map((image, index) => <button key={`${image}-${index}`} className={imageIndex === index ? "selected" : ""} onClick={() => setImageIndex(index)} aria-label={`${index + 1}. görseli göster`}><img src={image} alt="" /></button>)}</div>
           <div className="product-image">{images[imageIndex] ? <img src={images[imageIndex]} alt={product.title} /> : <span>Görsel eklenmedi</span>}</div>
         </div>
         <div className="product-details">
