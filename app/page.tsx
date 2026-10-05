@@ -890,7 +890,7 @@ export default function Home() {
                     width={900}
                     height={1200}
                   />
-                  {"hoverSrc" in item && (
+                  {"hoverSrc" in item && typeof item.hoverSrc === "string" && (
                     <Image
                       className="collection-image-hover"
                       src={item.hoverSrc}
