@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteChrome from "../components/SiteChrome";
+import HomeLinkFixes from "../components/HomeLinkFixes";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="tr">
       <body className="min-h-full flex flex-col">
         <SiteChrome>{children}</SiteChrome>
+        <HomeLinkFixes />
       </body>
     </html>
   );
