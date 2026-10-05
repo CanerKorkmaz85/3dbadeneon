@@ -7,18 +7,15 @@ echo 3Dbade Neon guncelleniyor...
 git pull
 
 echo.
-echo Yerel editor servisi baslatiliyor...
-start "3Dbade Editor" cmd /k "node scripts/local-editor.mjs"
-
-echo Yerel site baslatiliyor...
-start "3Dbade Site" cmd /k "npm run dev:next"
+echo Yerel editor ve site birlikte baslatiliyor...
+start "3Dbade Yerel Site" cmd /k "npm run dev"
 
 echo.
 echo Tarayici aciliyor...
-timeout /t 7 /nobreak >nul
+timeout /t 8 /nobreak >nul
 start "" http://localhost:3000/yonetim/urunler
 
 echo.
-echo Iki siyah pencere acik kalmali: 3Dbade Editor ve 3Dbade Site.
-echo Isin bitince bu pencereleri kapatabilirsin.
+echo Acilan "3Dbade Yerel Site" penceresini kapatma.
+echo Isin bitince kapatabilirsin.
 pause
