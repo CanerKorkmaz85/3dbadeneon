@@ -2,12 +2,10 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { productCopyHtml, sanitizeProductHtml } from "../../../components/FormattedProductCopy";
 import {
-  productCopyHtml,
-  sanitizeProductHtml,
-} from "../../../components/FormattedProductCopy";
-import {
+  adminProductsKey,
   productId,
   readAdminProducts,
   type AdminProduct,
@@ -58,11 +56,22 @@ const emptyDraft: Draft = {
   hoverImages: [],
 };
 
+function dataUrlToFile(dataUrl: string, name: string) {
+  const [header, body] = dataUrl.split(",");
+  const type = header.match(/data:(.*?);base64/)?.[1] || "image/jpeg";
+  const bytes = atob(body || "");
+  const array = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i += 1) array[i] = bytes.charCodeAt(i);
+  return new File([array], name, { type });
+}
+
 export default function ProductEntryPage() {
   const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
   function update(field: keyof Draft, value: string | string[]) {
@@ -71,14 +80,85 @@ export default function ProductEntryPage() {
 
   function flash(text: string) {
     setMessage(text);
-    window.setTimeout(() => setMessage(""), 3000);
+    window.setTimeout(() => setMessage(""), 3500);
   }
 
   function currentDescription() {
-    return sanitizeProductHtml(
-      descriptionRef.current?.innerHTML || draft.description || "",
-    );
+    return sanitizeProductHtml(descriptionRef.current?.innerHTML || draft.description || "");
   }
+
+  async function uploadFile(file: File, id: string) {
+    const form = new FormData();
+    form.set("file", file);
+    form.set("productId", id || "urun");
+    const response = await fetch("/api/product-images", { method: "POST", body: form });
+    if (!response.ok) throw new Error("Görsel yüklenemedi.");
+    const result = await response.json();
+    return String(result.url || "");
+  }
+
+  async function migrateDataImages(product: AdminProduct) {
+    const convert = async (source: string, suffix: string) => {
+      if (!source?.startsWith("data:image/")) return source;
+      return uploadFile(dataUrlToFile(source, `${suffix}.jpg`), product.id);
+    };
+    return {
+      ...product,
+      mainImage: await convert(product.mainImage, "ana"),
+      hoverImages: await Promise.all(
+        (product.hoverImages || []).map((image, index) => convert(image, `ek-${index + 1}`)),
+      ),
+    };
+  }
+
+  async function saveProductsOnline(next: AdminProduct[]) {
+    const response = await fetch("/api/products", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ products: next }),
+    });
+    if (!response.ok) throw new Error("Ürünler internete kaydedilemedi.");
+    writeAdminProducts(next);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const rawLocal = window.localStorage.getItem(adminProductsKey);
+        const migrated = window.localStorage.getItem("3dbade-cloud-migrated-v1");
+        if (rawLocal && !migrated) {
+          const localProducts = readAdminProducts();
+          const uploaded = [] as AdminProduct[];
+          for (const product of localProducts) uploaded.push(await migrateDataImages(product));
+          await saveProductsOnline(uploaded);
+          window.localStorage.setItem("3dbade-cloud-migrated-v1", "1");
+          if (!cancelled) {
+            setProducts(uploaded);
+            flash("Mevcut çalışmaların internete aktarıldı ✓");
+          }
+          return;
+        }
+
+        const response = await fetch("/api/products", { cache: "no-store" });
+        if (!response.ok) throw new Error("Ürün verisi alınamadı.");
+        const online = (await response.json()) as AdminProduct[];
+        if (!cancelled && Array.isArray(online)) {
+          setProducts(online);
+          writeAdminProducts(online);
+        }
+      } catch (error) {
+        console.error(error);
+        if (!cancelled) flash("İnternet veritabanına bağlanılamadı. Cloudflare kurulumu tamamlanmalı.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function buildProduct() {
     if (!draft.title.trim()) {
@@ -99,27 +179,30 @@ export default function ProductEntryPage() {
     return { id, product, next };
   }
 
-  function persist(showMessage = true) {
+  async function persist(showMessage = true) {
     const built = buildProduct();
-    if (!built) return null;
+    if (!built || saving) return null;
+    setSaving(true);
     try {
-      writeAdminProducts(built.next);
+      await saveProductsOnline(built.next);
       setProducts(built.next);
       setSelectedId(built.id);
       setDraft(built.product);
-      if (showMessage) flash("Kaydedildi ✓");
+      if (showMessage) flash("İnternete kaydedildi ✓");
       return built.id;
     } catch (error) {
       console.error(error);
-      flash("Kaydedilemedi. Görseller fazla büyük olabilir.");
+      flash("Kaydedilemedi. Cloudflare veritabanı bağlantısını kontrol et.");
       return null;
+    } finally {
+      setSaving(false);
     }
   }
 
-  function saveAndView() {
-    const id = persist(false);
+  async function saveAndView() {
+    const id = await persist(false);
     if (!id) return;
-    window.location.href = `/urunler/${id}`;
+    window.location.href = `/urunler/${id}?t=${Date.now()}`;
   }
 
   function selectProduct(product: AdminProduct) {
@@ -145,14 +228,18 @@ export default function ProductEntryPage() {
     if (descriptionRef.current) descriptionRef.current.innerHTML = "";
   }
 
-  function deleteProduct() {
+  async function deleteProduct() {
     const product = products.find((item) => item.id === selectedId);
     if (!product || !window.confirm(`“${product.title}” silinsin mi?`)) return;
     const next = products.filter((item) => item.id !== product.id);
-    writeAdminProducts(next);
-    setProducts(next);
-    newProduct();
-    flash("Ürün silindi.");
+    try {
+      await saveProductsOnline(next);
+      setProducts(next);
+      newProduct();
+      flash("Ürün internetten silindi.");
+    } catch {
+      flash("Ürün silinemedi.");
+    }
   }
 
   function formatText(command: string, value?: string) {
@@ -168,47 +255,24 @@ export default function ProductEntryPage() {
     document.execCommand("insertHTML", false, content);
   }
 
-  function readImage(file: File) {
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const source = String(reader.result || "");
-        const image = new Image();
-        image.onload = () => {
-          const limit = 720;
-          const scale = Math.min(1, limit / Math.max(image.width, image.height));
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.max(1, Math.round(image.width * scale));
-          canvas.height = Math.max(1, Math.round(image.height * scale));
-          const context = canvas.getContext("2d");
-          if (!context) return resolve(source);
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", 0.62));
-        };
-        image.onerror = () => reject(new Error("Görsel okunamadı."));
-        image.src = source;
-      };
-      reader.onerror = () => reject(new Error("Görsel okunamadı."));
-      reader.readAsDataURL(file);
-    });
-  }
-
   async function addImages(files: FileList | null, target: "main" | "hover") {
     if (!files?.length) return;
+    const id = selectedId || productId(draft.title || "urun");
     try {
-      const images = await Promise.all(Array.from(files).map(readImage));
-      if (target === "main") update("mainImage", images[0]);
-      else update("hoverImages", [...draft.hoverImages, ...images]);
-    } catch {
-      flash("Görsel okunamadı.");
+      flash("Görseller internete yükleniyor...");
+      const urls: string[] = [];
+      for (const file of Array.from(files)) urls.push(await uploadFile(file, id));
+      if (target === "main") update("mainImage", urls[0]);
+      else update("hoverImages", [...draft.hoverImages, ...urls]);
+      flash("Görseller yüklendi. Şimdi kaydet.");
+    } catch (error) {
+      console.error(error);
+      flash("Görsel yüklenemedi.");
     }
   }
 
   function removeHover(index: number) {
-    update(
-      "hoverImages",
-      draft.hoverImages.filter((_, itemIndex) => itemIndex !== index),
-    );
+    update("hoverImages", draft.hoverImages.filter((_, itemIndex) => itemIndex !== index));
   }
 
   function makeMain(index: number) {
@@ -242,26 +306,17 @@ export default function ProductEntryPage() {
       <section className="product-entry-heading">
         <p>ÜRÜN YÖNETİMİ</p>
         <h1>Ürünlerini yönet.</h1>
-        <span>Kaydet ve doğrudan yayındaki ürün sayfasında gör.</span>
+        <span>Kaydettiğin değişiklikler artık doğrudan internet sitesine yayınlanır.</span>
       </section>
 
       <section className="product-entry-grid product-management-grid">
         <aside className="managed-products">
-          <div>
-            <b>Mevcut ürünler</b>
-            <button type="button" onClick={newProduct}>+ YENİ ÜRÜN</button>
-          </div>
-          <small>{products.length} ürün kayıtlı</small>
+          <div><b>Mevcut ürünler</b><button type="button" onClick={newProduct}>+ YENİ ÜRÜN</button></div>
+          <small>{loading ? "Yükleniyor..." : `${products.length} ürün kayıtlı`}</small>
           <div className="managed-products-list">
             {products.map((product) => (
-              <button
-                type="button"
-                key={product.id}
-                className={selectedId === product.id ? "selected" : ""}
-                onClick={() => selectProduct(product)}
-              >
-                <b>{product.title}</b>
-                <span>{product.category}</span>
+              <button type="button" key={product.id} className={selectedId === product.id ? "selected" : ""} onClick={() => selectProduct(product)}>
+                <b>{product.title}</b><span>{product.category}</span>
               </button>
             ))}
           </div>
@@ -275,14 +330,12 @@ export default function ProductEntryPage() {
 
           <label>Ürün adı<input value={draft.title} onChange={(e) => update("title", e.target.value)} /></label>
           <label>Kategori<select value={draft.category} onChange={(e) => update("category", e.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
-
           <div className="entry-prices">
             <label>30 cm fiyatı<input value={draft.price30} onChange={(e) => update("price30", e.target.value)} /></label>
             <label>40 cm fiyatı<input value={draft.price40} onChange={(e) => update("price40", e.target.value)} /></label>
             <label>50 cm fiyatı<input value={draft.price50} onChange={(e) => update("price50", e.target.value)} /></label>
             <label>Özel ölçü<input value={draft.specialPrice} onChange={(e) => update("specialPrice", e.target.value)} /></label>
           </div>
-
           <label>Kumandalı ek fiyatı<input value={draft.remoteExtra} onChange={(e) => update("remoteExtra", e.target.value)} /></label>
 
           <div className="entry-description-editor">
@@ -311,10 +364,9 @@ export default function ProductEntryPage() {
           </div>
 
           <label>Teknik özellikler<textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} /></label>
-
           <div className="entry-buttons">
-            <button type="button" onClick={() => persist()}>{selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}</button>
-            <button type="button" className="entry-preview" onClick={saveAndView}>KAYDET VE SİTEDE GÖR</button>
+            <button type="button" disabled={saving} onClick={() => persist()}>{saving ? "KAYDEDİLİYOR..." : selectedId ? "DEĞİŞİKLİKLERİ YAYINLA" : "ÜRÜNÜ YAYINLA"}</button>
+            <button type="button" disabled={saving} className="entry-preview" onClick={saveAndView}>YAYINLA VE SİTEDE GÖR</button>
           </div>
           {message && <small className="entry-saved">{message}</small>}
         </div>
@@ -322,27 +374,17 @@ export default function ProductEntryPage() {
         <aside className="entry-images">
           <b>Ürün görselleri</b>
           <span>Ana görsel ve galeri görsellerini buradan yönet.</span>
-
           <div style={{ border: "2px solid #111", borderRadius: 14, padding: 12, marginTop: 10 }}>
             <b>ANA GÖRSEL</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>
-              ANA GÖRSELİ DEĞİŞTİR
-              <input type="file" accept="image/*" onChange={(e) => addImages(e.target.files, "main")} />
-            </label>
+            <label className="entry-upload" style={{ marginTop: 10 }}>ANA GÖRSELİ DEĞİŞTİR<input type="file" accept="image/*" onChange={(e) => addImages(e.target.files, "main")} /></label>
             {draft.mainImage ? <><img src={draft.mainImage} alt="Ana görsel" /><button type="button" style={{ ...smallButton, width: "100%", marginTop: 8 }} onClick={() => update("mainImage", "")}>ANA GÖRSELİ SİL</button></> : <small>Ana görsel yok.</small>}
           </div>
-
           <div style={{ border: "1px solid #ccc", borderRadius: 14, padding: 12, marginTop: 14 }}>
             <b>EK / GALERİ GÖRSELLERİ</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>
-              YENİ GÖRSEL EKLE
-              <input type="file" accept="image/*" multiple onChange={(e) => addImages(e.target.files, "hover")} />
-            </label>
-
+            <label className="entry-upload" style={{ marginTop: 10 }}>YENİ GÖRSEL EKLE<input type="file" accept="image/*" multiple onChange={(e) => addImages(e.target.files, "hover")} /></label>
             {draft.hoverImages.map((image, index) => (
               <div key={`${image}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
-                <b>{index + 1}. GÖRSEL</b>
-                <img src={image} alt={`${index + 1}. ek görsel`} />
+                <b>{index + 1}. GÖRSEL</b><img src={image} alt={`${index + 1}. ek görsel`} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 8 }}>
                   <button type="button" style={smallButton} onClick={() => makeMain(index)}>ANA GÖRSEL YAP</button>
                   <button type="button" style={smallButton} onClick={() => removeHover(index)}>SİL</button>
