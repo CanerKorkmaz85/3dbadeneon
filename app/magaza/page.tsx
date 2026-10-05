@@ -31,6 +31,17 @@ function matchesCategory(product: Pick<AdminProduct, "id" | "title" | "category"
   return product.category === category;
 }
 
+async function loadProducts(): Promise<AdminProduct[]> {
+  try {
+    const response = await fetch(`/data/products.json?t=${Date.now()}`, { cache: "no-store" });
+    if (response.ok) return (await response.json()) as AdminProduct[];
+  } catch {}
+
+  const fallback = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
+  if (!fallback.ok) throw new Error("Ürünler alınamadı.");
+  return (await fallback.json()) as AdminProduct[];
+}
+
 export default function MagazaPage() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [, setCartCount] = useState(0);
@@ -40,18 +51,14 @@ export default function MagazaPage() {
     let cancelled = false;
     async function load() {
       try {
-        const response = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error("Ürünler alınamadı.");
-        const online = (await response.json()) as AdminProduct[];
+        const online = await loadProducts();
         if (!cancelled && Array.isArray(online)) setProducts(online);
       } catch {
         if (!cancelled) setProducts(readAdminProducts());
       }
     }
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   const catalogProducts = products.map((product) => ({
