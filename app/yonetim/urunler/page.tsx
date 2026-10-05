@@ -5,12 +5,13 @@
 import { useEffect, useRef, useState } from "react";
 import { productCopyHtml, sanitizeProductHtml } from "../../../components/FormattedProductCopy";
 import {
-  adminProductsKey,
   productId,
   readAdminProducts,
   type AdminProduct,
   writeAdminProducts,
 } from "../../../lib/admin-products";
+
+const editorUrl = "http://127.0.0.1:3002";
 
 const categories = [
   "Takımlar",
@@ -48,7 +49,7 @@ const emptyDraft: Draft = {
   price30: "",
   price40: "",
   price50: "",
-  specialPrice: "Teklif al",
+  specialPrice: "Teklif Al",
   remoteExtra: "250",
   description: "",
   technical: technicalTemplate,
@@ -63,17 +64,9 @@ export default function ProductEntryPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [adminPassword, setAdminPassword] = useState("");
-  const [passwordReady, setPasswordReady] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [localReady, setLocalReady] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const stored = window.sessionStorage.getItem("3dbade-admin-password") || "";
-    if (stored) {
-      setAdminPassword(stored);
-      setPasswordReady(true);
-    }
-  }, []);
 
   function update(field: keyof Draft, value: string | string[]) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -81,61 +74,11 @@ export default function ProductEntryPage() {
 
   function flash(text: string) {
     setMessage(text);
-    window.setTimeout(() => setMessage(""), 4000);
+    window.setTimeout(() => setMessage(""), 5000);
   }
 
   function currentDescription() {
     return sanitizeProductHtml(descriptionRef.current?.innerHTML || draft.description || "");
-  }
-
-  function storeAdminPassword() {
-    const value = adminPassword.trim();
-    if (!value) {
-      flash("Yönetim şifresini gir.");
-      return;
-    }
-    window.sessionStorage.setItem("3dbade-admin-password", value);
-    setPasswordReady(true);
-    flash("Yönetim şifresi hazır ✓");
-  }
-
-  function getAdminPassword() {
-    return (
-      adminPassword.trim() ||
-      window.sessionStorage.getItem("3dbade-admin-password") ||
-      ""
-    );
-  }
-
-  async function saveProductsOnline(next: AdminProduct[]) {
-    const password = getAdminPassword();
-    if (!password) throw new Error("Önce yönetim şifresini yukarıdaki alana gir.");
-
-    const response = await fetch("/api/products", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-password": password,
-      },
-      body: JSON.stringify({ products: next }),
-    });
-
-    if (response.status === 401) {
-      window.sessionStorage.removeItem("3dbade-admin-password");
-      setPasswordReady(false);
-      throw new Error("Yönetim şifresi hatalı. Şifreyi yeniden gir.");
-    }
-    if (response.status === 503) {
-      throw new Error("Cloudflare yönetim şifresi henüz tanımlı değil.");
-    }
-    if (!response.ok) throw new Error("Ürünler internete kaydedilemedi.");
-
-    try {
-      writeAdminProducts(next);
-    } catch {
-      // D1 kaydı başarılıysa tarayıcı kotası dolu olsa da internet kaydını koru.
-    }
-    window.localStorage.setItem("3dbade-d1-migrated-v1", "1");
   }
 
   useEffect(() => {
@@ -143,40 +86,32 @@ export default function ProductEntryPage() {
 
     async function load() {
       try {
-        const localExists = Boolean(window.localStorage.getItem(adminProductsKey));
-        const migrated = window.localStorage.getItem("3dbade-d1-migrated-v1") === "1";
+        const health = await fetch(`${editorUrl}/health`, { cache: "no-store" });
+        if (!health.ok) throw new Error("Yerel editor kapali");
+        if (!cancelled) setLocalReady(true);
 
-        if (localExists && !migrated) {
-          if (!cancelled) {
-            setProducts(readAdminProducts());
-            flash("Tarayıcıdaki mevcut çalışmalar hazır. Ürünü seçip KAYDET dediğinde internete aktarılacak.");
-          }
-          return;
+        const response = await fetch(`${editorUrl}/products?t=${Date.now()}`, { cache: "no-store" });
+        const result = await response.json();
+        if (!cancelled && Array.isArray(result.products) && result.products.length) {
+          setProducts(result.products);
+          try { writeAdminProducts(result.products); } catch {}
         }
-
-        const response = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error("Ürün verisi alınamadı.");
-        const online = (await response.json()) as AdminProduct[];
-        if (!cancelled && Array.isArray(online)) {
-          setProducts(online);
-          try {
-            writeAdminProducts(online);
-          } catch {
-            // Yerel depolama dolu olabilir; D1 ana kaynak olarak çalışır.
+      } catch {
+        if (!cancelled) {
+          setLocalReady(false);
+          if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+            flash("Yerel editor servisi acik degil. CMD'de proje klasorunde npm run dev calistir.");
+          } else {
+            flash("Bu paneli duzenleme icin bilgisayarinda localhost:3000 uzerinden kullan.");
           }
         }
-      } catch (error) {
-        console.error(error);
-        if (!cancelled) flash("D1 veritabanı bağlantısı henüz tamamlanmadı.");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   function buildProduct() {
@@ -201,20 +136,33 @@ export default function ProductEntryPage() {
     return { id, product, next };
   }
 
-  async function persist(showMessage = true) {
+  async function saveLocal(showMessage = true) {
     const built = buildProduct();
     if (!built || saving) return null;
+    if (!localReady) {
+      flash("Önce bilgisayarında npm run dev ile yerel siteyi aç.");
+      return null;
+    }
 
     setSaving(true);
     try {
-      await saveProductsOnline(built.next);
-      setProducts(built.next);
-      setSelectedId(built.id);
-      setDraft(built.product);
-      if (showMessage) flash("İnternete kaydedildi ✓");
-      return built.id;
+      const response = await fetch(`${editorUrl}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products: built.next }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Kaydedilemedi.");
+
+      const savedProducts = result.products as AdminProduct[];
+      const savedProduct = savedProducts.find((item) => item.id === built.id) || built.product;
+      setProducts(savedProducts);
+      setSelectedId(savedProduct.id);
+      setDraft(savedProduct);
+      try { writeAdminProducts(savedProducts); } catch {}
+      if (showMessage) flash("Bilgisayara kaydedildi ✓");
+      return savedProduct.id;
     } catch (error) {
-      console.error(error);
       flash(error instanceof Error ? error.message : "Kaydedilemedi.");
       return null;
     } finally {
@@ -223,9 +171,26 @@ export default function ProductEntryPage() {
   }
 
   async function saveAndView() {
-    const id = await persist(false);
+    const id = await saveLocal(false);
     if (!id) return;
-    window.location.href = `/urunler/${id}?t=${Date.now()}`;
+    window.open(`/urunler/${id}?t=${Date.now()}`, "_blank");
+    flash("Kaydedildi. Ürün sayfası yeni sekmede açıldı ✓");
+  }
+
+  async function publishSite() {
+    const id = await saveLocal(false);
+    if (!id || publishing) return;
+    setPublishing(true);
+    try {
+      const response = await fetch(`${editorUrl}/publish`, { method: "POST" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Yayınlanamadı.");
+      flash(result.message || "GitHub'a gönderildi. Cloudflare otomatik yayınlayacak ✓");
+    } catch (error) {
+      flash(error instanceof Error ? error.message : "Yayınlanamadı.");
+    } finally {
+      setPublishing(false);
+    }
   }
 
   function selectProduct(product: AdminProduct) {
@@ -253,15 +218,23 @@ export default function ProductEntryPage() {
 
   async function deleteProduct() {
     const product = products.find((item) => item.id === selectedId);
-    if (!product || !window.confirm(`“${product.title}” silinsin mi?`)) return;
+    if (!product) return;
+    if (!window.confirm(`“${product.title}” silinsin mi?`)) return;
+    if (!localReady) return flash("Silmek için localhost üzerinde çalış.");
 
     const next = products.filter((item) => item.id !== product.id);
     setSaving(true);
     try {
-      await saveProductsOnline(next);
-      setProducts(next);
+      const response = await fetch(`${editorUrl}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products: next }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Silinemedi.");
+      setProducts(result.products);
       newProduct();
-      flash("Ürün internetten silindi.");
+      flash("Ürün silindi. Yayınlamak istediğinde SİTEYİ YAYINLA'ya bas.");
     } catch (error) {
       flash(error instanceof Error ? error.message : "Ürün silinemedi.");
     } finally {
@@ -289,7 +262,7 @@ export default function ProductEntryPage() {
         const source = String(reader.result || "");
         const image = new Image();
         image.onload = () => {
-          const limit = 700;
+          const limit = 1200;
           const scale = Math.min(1, limit / Math.max(image.width, image.height));
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.round(image.width * scale));
@@ -297,7 +270,7 @@ export default function ProductEntryPage() {
           const context = canvas.getContext("2d");
           if (!context) return resolve(source);
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", 0.6));
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
         };
         image.onerror = () => reject(new Error("Görsel okunamadı."));
         image.src = source;
@@ -314,18 +287,14 @@ export default function ProductEntryPage() {
       const images = await Promise.all(Array.from(files).map(readImage));
       if (target === "main") update("mainImage", images[0]);
       else update("hoverImages", [...draft.hoverImages, ...images]);
-      flash("Görsel hazır. İnternete göndermek için KAYDET'e bas.");
-    } catch (error) {
-      console.error(error);
+      flash("Görsel hazır. KAYDET dediğinde bilgisayara yazılacak.");
+    } catch {
       flash("Görsel okunamadı.");
     }
   }
 
   function removeHover(index: number) {
-    update(
-      "hoverImages",
-      draft.hoverImages.filter((_, itemIndex) => itemIndex !== index),
-    );
+    update("hoverImages", draft.hoverImages.filter((_, itemIndex) => itemIndex !== index));
   }
 
   function makeMain(index: number) {
@@ -358,71 +327,21 @@ export default function ProductEntryPage() {
     <main className="product-entry-page">
       <section className="product-entry-heading">
         <p>ÜRÜN YÖNETİMİ</p>
-        <h1>Ürünlerini yönet.</h1>
-        <span>Kaydettiğin değişiklikler D1 veritabanına yazılır ve gerçek sitede görünür.</span>
-
-        <div
-          style={{
-            marginTop: 18,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 8,
-            alignItems: "center",
-            maxWidth: 560,
-          }}
-        >
-          <input
-            type="password"
-            value={adminPassword}
-            onChange={(event) => {
-              setAdminPassword(event.target.value);
-              setPasswordReady(false);
-            }}
-            placeholder="Yönetim şifresi"
-            autoComplete="current-password"
-            style={{
-              flex: "1 1 240px",
-              padding: "12px 14px",
-              border: "1px solid #bbb",
-              borderRadius: 10,
-              fontSize: 15,
-            }}
-          />
-          <button
-            type="button"
-            onClick={storeAdminPassword}
-            style={{
-              padding: "12px 14px",
-              border: 0,
-              borderRadius: 10,
-              background: "#111",
-              color: "white",
-              fontWeight: 800,
-              cursor: "pointer",
-            }}
-          >
-            {passwordReady ? "ŞİFRE HAZIR ✓" : "ŞİFREYİ KAYDET"}
-          </button>
+        <h1>Önce gör, sonra yayınla.</h1>
+        <span>Bilgisayarında düzenle → hemen kontrol et → hazır olduğunda tek tuşla yayınla.</span>
+        <div style={{ marginTop: 12, fontWeight: 800, color: localReady ? "#15803d" : "#b45309" }}>
+          {loading ? "Yerel sistem kontrol ediliyor..." : localReady ? "● YEREL SİSTEM HAZIR" : "● YEREL SİSTEM KAPALI"}
         </div>
       </section>
 
       <section className="product-entry-grid product-management-grid">
         <aside className="managed-products">
-          <div>
-            <b>Mevcut ürünler</b>
-            <button type="button" onClick={newProduct}>+ YENİ ÜRÜN</button>
-          </div>
-          <small>{loading ? "Yükleniyor..." : `${products.length} ürün kayıtlı`}</small>
+          <div><b>Mevcut ürünler</b><button type="button" onClick={newProduct}>+ YENİ ÜRÜN</button></div>
+          <small>{products.length} ürün</small>
           <div className="managed-products-list">
             {products.map((product) => (
-              <button
-                type="button"
-                key={product.id}
-                className={selectedId === product.id ? "selected" : ""}
-                onClick={() => selectProduct(product)}
-              >
-                <b>{product.title}</b>
-                <span>{product.category}</span>
+              <button type="button" key={product.id} className={selectedId === product.id ? "selected" : ""} onClick={() => selectProduct(product)}>
+                <b>{product.title}</b><span>{product.category}</span>
               </button>
             ))}
           </div>
@@ -431,22 +350,11 @@ export default function ProductEntryPage() {
         <div className="entry-form">
           <div className="entry-form-title">
             <b>{selectedId ? "ÜRÜNÜ DÜZENLİYORSUN" : "YENİ ÜRÜN"}</b>
-            {selectedId && (
-              <button type="button" onClick={deleteProduct} disabled={saving}>ÜRÜNÜ SİL</button>
-            )}
+            {selectedId && <button type="button" onClick={deleteProduct} disabled={saving}>ÜRÜNÜ SİL</button>}
           </div>
 
-          <label>
-            Ürün adı
-            <input value={draft.title} onChange={(e) => update("title", e.target.value)} />
-          </label>
-
-          <label>
-            Kategori
-            <select value={draft.category} onChange={(e) => update("category", e.target.value)}>
-              {categories.map((category) => <option key={category}>{category}</option>)}
-            </select>
-          </label>
+          <label>Ürün adı<input value={draft.title} onChange={(e) => update("title", e.target.value)} /></label>
+          <label>Kategori<select value={draft.category} onChange={(e) => update("category", e.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
 
           <div className="entry-prices">
             <label>30 cm fiyatı<input value={draft.price30} onChange={(e) => update("price30", e.target.value)} /></label>
@@ -464,22 +372,18 @@ export default function ProductEntryPage() {
               <button type="button" style={{ ...smallButton, fontStyle: "italic" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("italic")}>I</button>
               <button type="button" style={{ ...smallButton, textDecoration: "underline" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("underline")}>U</button>
               <select defaultValue="p" onChange={(e) => formatText("formatBlock", e.target.value)}>
-                <option value="p">Normal</option>
-                <option value="h2">Başlık</option>
-                <option value="h3">Alt başlık</option>
-                <option value="blockquote">Alıntı</option>
+                <option value="p">Normal</option><option value="h2">Başlık</option><option value="h3">Alt başlık</option><option value="blockquote">Alıntı</option>
               </select>
               <select defaultValue="3" onChange={(e) => formatText("fontSize", e.target.value)}>
-                <option value="2">Küçük</option>
-                <option value="3">Normal</option>
-                <option value="4">Büyük</option>
-                <option value="5">Çok büyük</option>
+                <option value="2">Küçük</option><option value="3">Normal</option><option value="4">Büyük</option><option value="5">Çok büyük</option>
+              </select>
+              <select defaultValue="Arial" onChange={(e) => formatText("fontName", e.target.value)}>
+                <option>Arial</option><option>Georgia</option><option>Trebuchet MS</option><option>Verdana</option><option>Times New Roman</option>
               </select>
               <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertUnorderedList")}>• Liste</button>
               <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertOrderedList")}>1. Liste</button>
               <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("removeFormat")}>Biçimi temizle</button>
             </div>
-
             <div
               key={selectedId || "new"}
               ref={descriptionRef}
@@ -493,52 +397,38 @@ export default function ProductEntryPage() {
             />
           </div>
 
-          <label>
-            Teknik özellikler
-            <textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} />
-          </label>
+          <label>Teknik özellikler<textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} /></label>
 
-          <div className="entry-buttons">
-            <button type="button" disabled={saving} onClick={() => persist()}>
-              {saving ? "KAYDEDİLİYOR..." : selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}
-            </button>
-            <button type="button" disabled={saving} className="entry-preview" onClick={saveAndView}>
-              KAYDET VE SİTEDE GÖR
+          <div className="entry-buttons" style={{ flexWrap: "wrap" }}>
+            <button type="button" disabled={saving || publishing} onClick={() => saveLocal()}>{saving ? "KAYDEDİLİYOR..." : "KAYDET"}</button>
+            <button type="button" disabled={saving || publishing} className="entry-preview" onClick={saveAndView}>KAYDET VE SİTEDE GÖR</button>
+            <button type="button" disabled={saving || publishing} onClick={publishSite} style={{ background: "#111", color: "white", minWidth: 180 }}>
+              {publishing ? "YAYINLANIYOR..." : "🚀 SİTEYİ YAYINLA"}
             </button>
           </div>
-
           {message && <small className="entry-saved">{message}</small>}
         </div>
 
         <aside className="entry-images">
           <b>Ürün görselleri</b>
-          <span>Görseller ücretsiz D1 düzeninde sıkıştırılarak ürün kaydıyla birlikte tutulur.</span>
+          <span>Görseller ürün dosyalarıyla birlikte bilgisayarına kaydedilir.</span>
 
           <div style={{ border: "2px solid #111", borderRadius: 14, padding: 12, marginTop: 10 }}>
             <b>ANA GÖRSEL</b>
             <label className="entry-upload" style={{ marginTop: 10 }}>
               ANA GÖRSELİ DEĞİŞTİR
-              <input type="file" accept="image/*" onChange={(e) => addImages(e.target.files, "main")} />
+              <input type="file" accept="image/*" onChange={(e) => { addImages(e.target.files, "main"); e.currentTarget.value = ""; }} />
             </label>
-            {draft.mainImage ? (
-              <>
-                <img src={draft.mainImage} alt="Ana görsel" />
-                <button type="button" style={{ ...smallButton, width: "100%", marginTop: 8 }} onClick={() => update("mainImage", "")}>ANA GÖRSELİ SİL</button>
-              </>
-            ) : (
-              <small>Ana görsel yok.</small>
-            )}
+            {draft.mainImage ? <><img src={draft.mainImage} alt="Ana görsel" /><button type="button" style={{ ...smallButton, width: "100%", marginTop: 8 }} onClick={() => update("mainImage", "")}>ANA GÖRSELİ SİL</button></> : <small>Ana görsel yok.</small>}
           </div>
 
           <div style={{ border: "1px solid #ccc", borderRadius: 14, padding: 12, marginTop: 14 }}>
             <b>EK / GALERİ GÖRSELLERİ</b>
             <label className="entry-upload" style={{ marginTop: 10 }}>
               YENİ GÖRSEL EKLE
-              <input type="file" accept="image/*" multiple onChange={(e) => addImages(e.target.files, "hover")} />
+              <input type="file" accept="image/*" multiple onChange={(e) => { addImages(e.target.files, "hover"); e.currentTarget.value = ""; }} />
             </label>
-
             {draft.hoverImages.length === 0 && <small>Ek görsel yok.</small>}
-
             {draft.hoverImages.map((image, index) => (
               <div key={`${image.slice(0, 80)}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
                 <b>{index + 1}. GÖRSEL</b>
