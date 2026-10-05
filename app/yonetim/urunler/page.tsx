@@ -2,8 +2,11 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useState } from "react";
-import FormattedProductCopy from "../../../components/FormattedProductCopy";
+import { useRef, useState } from "react";
+import FormattedProductCopy, {
+  productCopyHtml,
+  sanitizeProductHtml,
+} from "../../../components/FormattedProductCopy";
 import {
   productId,
   readAdminProducts,
@@ -60,15 +63,21 @@ export default function ProductEntryPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
 
   const update = (field: keyof Draft, value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
+
+  function currentDescription() {
+    return sanitizeProductHtml(descriptionRef.current?.innerHTML || draft.description || "");
+  }
 
   function saveDraft() {
     if (!draft.title.trim()) return;
     const id = selectedId || productId(draft.title);
     const product: AdminProduct = {
       ...draft,
+      description: currentDescription(),
       id,
       title: draft.title.trim(),
       hoverImages: draft.hoverImages || [],
@@ -104,18 +113,30 @@ export default function ProductEntryPage() {
   }
 
   function openPreview() {
+    const description = currentDescription();
     window.localStorage.setItem(
       "3dbade-product-preview",
-      JSON.stringify({ ...draft, mainPreview: draft.mainImage, hoverPreviews: draft.hoverImages }),
+      JSON.stringify({
+        ...draft,
+        description,
+        mainPreview: draft.mainImage,
+        hoverPreviews: draft.hoverImages,
+      }),
     );
     window.open("/yonetim/urun-onizleme", "_blank");
   }
 
   async function copyDetails() {
-    const content = `ÜRÜN ADI: ${draft.title || "-"}\nKATEGORİ: ${draft.category}\n30 CM: ${draft.price30 || "-"}\n40 CM: ${draft.price40 || "-"}\n50 CM: ${draft.price50 || "-"}\nÖZEL ÖLÇÜ: ${draft.specialPrice || "Teklif al"}\nKUMANDALI EK FİYAT: ${draft.remoteExtra || "0"} TL\n\nÜRÜN AÇIKLAMASI\n${draft.description || "-"}\n\nTEKNİK ÖZELLİKLER\n${draft.technical}`;
+    const description = descriptionRef.current?.innerText || draft.description || "-";
+    const content = `ÜRÜN ADI: ${draft.title || "-"}\nKATEGORİ: ${draft.category}\n30 CM: ${draft.price30 || "-"}\n40 CM: ${draft.price40 || "-"}\n50 CM: ${draft.price50 || "-"}\nÖZEL ÖLÇÜ: ${draft.specialPrice || "Teklif al"}\nKUMANDALI EK FİYAT: ${draft.remoteExtra || "0"} TL\n\nÜRÜN AÇIKLAMASI\n${description}\n\nTEKNİK ÖZELLİKLER\n${draft.technical}`;
     await navigator.clipboard.writeText(content);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2500);
+  }
+
+  function formatText(command: string, value?: string) {
+    descriptionRef.current?.focus();
+    document.execCommand(command, false, value);
   }
 
   function readImage(file: File) {
@@ -197,6 +218,15 @@ export default function ProductEntryPage() {
     fontSize: "12px",
   } as const;
 
+  const toolbarButtonStyle = {
+    padding: "7px 10px",
+    border: "1px solid #ccc",
+    borderRadius: 7,
+    background: "#fff",
+    cursor: "pointer",
+    fontWeight: 700,
+  } as const;
+
   return (
     <main className="product-entry-page">
       <section className="product-entry-heading">
@@ -232,17 +262,8 @@ export default function ProductEntryPage() {
             {selectedId && <button onClick={deleteProduct}>ÜRÜNÜ SİL</button>}
           </div>
 
-          <label>
-            Ürün adı
-            <input value={draft.title} onChange={(event) => update("title", event.target.value)} />
-          </label>
-
-          <label>
-            Kategori
-            <select value={draft.category} onChange={(event) => update("category", event.target.value)}>
-              {categories.map((category) => <option key={category}>{category}</option>)}
-            </select>
-          </label>
+          <label>Ürün adı<input value={draft.title} onChange={(event) => update("title", event.target.value)} /></label>
+          <label>Kategori<select value={draft.category} onChange={(event) => update("category", event.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
 
           <div className="entry-prices">
             <label>30 cm fiyatı<input inputMode="numeric" value={draft.price30} onChange={(event) => update("price30", event.target.value)} /></label>
@@ -251,72 +272,70 @@ export default function ProductEntryPage() {
             <label>Özel ölçü<input value={draft.specialPrice} onChange={(event) => update("specialPrice", event.target.value)} /></label>
           </div>
 
-          <label>
-            Kumandalı ek fiyatı
-            <input inputMode="numeric" value={draft.remoteExtra} onChange={(event) => update("remoteExtra", event.target.value)} />
-          </label>
+          <label>Kumandalı ek fiyatı<input inputMode="numeric" value={draft.remoteExtra} onChange={(event) => update("remoteExtra", event.target.value)} /></label>
 
-          <label>
-            Ürün açıklaması
-            <textarea
-              style={{ minHeight: 320, lineHeight: 1.55 }}
-              value={draft.description}
-              onChange={(event) => update("description", event.target.value)}
-              placeholder="Ürün açıklamasını buradan doğrudan değiştir."
+          <div className="entry-description-editor">
+            <label>Ürün açıklaması</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: "9px", border: "1px solid #ddd", borderBottom: 0, borderRadius: "10px 10px 0 0", background: "#f8f8f8" }}>
+              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("bold")}>B</button>
+              <button type="button" style={{ ...toolbarButtonStyle, fontStyle: "italic" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("italic")}>I</button>
+              <button type="button" style={{ ...toolbarButtonStyle, textDecoration: "underline" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("underline")}>U</button>
+              <select defaultValue="p" onChange={(e) => formatText("formatBlock", e.target.value)} style={{ padding: "7px" }}>
+                <option value="p">Normal</option><option value="h2">Başlık</option><option value="h3">Alt başlık</option><option value="blockquote">Alıntı</option>
+              </select>
+              <select defaultValue="3" onChange={(e) => formatText("fontSize", e.target.value)} style={{ padding: "7px" }}>
+                <option value="2">Küçük</option><option value="3">Normal</option><option value="4">Büyük</option><option value="5">Çok büyük</option>
+              </select>
+              <select defaultValue="Arial" onChange={(e) => formatText("fontName", e.target.value)} style={{ padding: "7px" }}>
+                <option>Arial</option><option>Georgia</option><option>Trebuchet MS</option><option>Verdana</option><option>Times New Roman</option>
+              </select>
+              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertUnorderedList")}>• Liste</button>
+              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertOrderedList")}>1. Liste</button>
+              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("removeFormat")}>Biçimi temizle</button>
+            </div>
+            <div
+              key={selectedId || "new-product"}
+              ref={descriptionRef}
+              className="entry-description-field product-full-description"
+              contentEditable
+              suppressContentEditableWarning
+              style={{ minHeight: 340, borderRadius: "0 0 10px 10px", padding: 16, outline: "none", background: "white" }}
+              dangerouslySetInnerHTML={{ __html: productCopyHtml(draft.description) }}
+              onBlur={(event) => update("description", sanitizeProductHtml(event.currentTarget.innerHTML))}
             />
-          </label>
+            <small>Başka bir yerden kopyalayıp yapıştırabilirsin. Kalın, eğik, başlık, yazı boyutu ve yazı tipi mümkün olduğunca korunur; ayrıca üstteki araçlardan elle değiştirebilirsin.</small>
+          </div>
 
           <div className="entry-description-preview product-content-area product-full-description" aria-live="polite">
             <p>ÜRÜN SAYFASI ÖNİZLEMESİ</p>
-            <div className="product-copy-preview">
-              <FormattedProductCopy content={draft.description || "Ürün açıklaması burada görünecek."} />
-            </div>
+            <div className="product-copy-preview"><FormattedProductCopy content={draft.description || "Ürün açıklaması burada görünecek."} /></div>
           </div>
 
-          <label>
-            Teknik özellikler
-            <textarea value={draft.technical} onChange={(event) => update("technical", event.target.value)} />
-          </label>
+          <label>Teknik özellikler<textarea value={draft.technical} onChange={(event) => update("technical", event.target.value)} /></label>
 
           <div className="entry-buttons">
             <button onClick={saveDraft}>{selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}</button>
             <button className="entry-preview" onClick={openPreview}>CANLI ÖNİZLEME</button>
             <button className="entry-copy" onClick={copyDetails}>{copied ? "KOPYALANDI ✓" : "BİLGİLERİ KOPYALA"}</button>
           </div>
-
           {saved && <small className="entry-saved">Kaydedildi.</small>}
         </div>
 
         <aside className="entry-images">
           <b>Ürün görselleri</b>
           <span><strong>Ana görsel</strong> mağaza kartında ilk görünen görseldir. <strong>Ek / hover görseller</strong> ürün galerisindeki diğer görsellerdir.</span>
-
           <div style={{ border: "2px solid #111", borderRadius: 14, padding: 12, marginTop: 10 }}>
             <b>1. ANA GÖRSEL</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>
-              ANA GÖRSELİ DEĞİŞTİR
-              <input type="file" accept="image/*" onChange={(event) => preview(event.target.files, "main")} />
-            </label>
-            {draft.mainImage ? (
-              <>
-                <img src={draft.mainImage} alt="Ana görsel" />
-                <button type="button" style={{ ...imageButtonStyle, width: "100%", marginTop: 8 }} onClick={removeMainImage}>ANA GÖRSELİ SİL</button>
-              </>
-            ) : <small>Ana görsel yok.</small>}
+            <label className="entry-upload" style={{ marginTop: 10 }}>ANA GÖRSELİ DEĞİŞTİR<input type="file" accept="image/*" onChange={(event) => preview(event.target.files, "main")} /></label>
+            {draft.mainImage ? <><img src={draft.mainImage} alt="Ana görsel" /><button type="button" style={{ ...imageButtonStyle, width: "100%", marginTop: 8 }} onClick={removeMainImage}>ANA GÖRSELİ SİL</button></> : <small>Ana görsel yok.</small>}
           </div>
-
           <div style={{ border: "1px solid #ccc", borderRadius: 14, padding: 12, marginTop: 14 }}>
             <b>2. EK / HOVER GÖRSELLER</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>
-              YENİ GÖRSEL EKLE
-              <input type="file" accept="image/*" multiple onChange={(event) => preview(event.target.files, "hover")} />
-            </label>
-
+            <label className="entry-upload" style={{ marginTop: 10 }}>YENİ GÖRSEL EKLE<input type="file" accept="image/*" multiple onChange={(event) => preview(event.target.files, "hover")} /></label>
             {draft.hoverImages.length === 0 && <small>Ek görsel yok.</small>}
             {draft.hoverImages.map((image, index) => (
               <div key={`${image}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
-                <b>{index + 1}. EK GÖRSEL</b>
-                <img src={image} alt={`${index + 1}. ek görsel`} />
+                <b>{index + 1}. EK GÖRSEL</b><img src={image} alt={`${index + 1}. ek görsel`} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 8 }}>
                   <button type="button" style={imageButtonStyle} onClick={() => makeMainImage(index)}>ANA GÖRSEL YAP</button>
                   <button type="button" style={imageButtonStyle} onClick={() => removeHoverImage(index)}>SİL</button>
@@ -326,10 +345,7 @@ export default function ProductEntryPage() {
               </div>
             ))}
           </div>
-
-          <small style={{ marginTop: 12 }}>
-            Değişikliklerden sonra mutlaka “DEĞİŞİKLİKLERİ KAYDET” butonuna bas.
-          </small>
+          <small style={{ marginTop: 12 }}>Değişikliklerden sonra mutlaka “DEĞİŞİKLİKLERİ KAYDET” butonuna bas.</small>
         </aside>
       </section>
     </main>
