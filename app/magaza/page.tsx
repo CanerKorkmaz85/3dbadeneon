@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { readAdminProducts, type AdminProduct } from "../../lib/admin-products";
 
 const categories = [
@@ -43,9 +44,15 @@ async function loadProducts(): Promise<AdminProduct[]> {
 }
 
 export default function MagazaPage() {
+  const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [, setCartCount] = useState(0);
   const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
+
+  useEffect(() => {
+    const requested = searchParams.get("kategori");
+    if (requested && categories.includes(requested)) setSelectedCategory(requested);
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
