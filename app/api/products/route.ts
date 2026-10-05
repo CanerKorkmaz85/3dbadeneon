@@ -4,27 +4,65 @@ import { defaultProducts, type AdminProduct } from "../../../lib/admin-products"
 
 const runtime = env as unknown as {
   DB: typeof env.DB;
-  ADMIN_PASSWORD?: string;
 };
 
-async function ensureTable() {
-  await runtime.DB.prepare(
-    `CREATE TABLE IF NOT EXISTS products (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      category TEXT NOT NULL,
-      price30 TEXT NOT NULL,
-      price40 TEXT NOT NULL,
-      price50 TEXT NOT NULL,
-      special_price TEXT NOT NULL,
-      remote_extra TEXT NOT NULL,
-      description TEXT NOT NULL,
-      technical TEXT NOT NULL,
-      main_image TEXT NOT NULL,
-      hover_images TEXT NOT NULL,
-      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )`,
-  ).run();
+async function ensureTables() {
+  await runtime.DB.batch([
+    runtime.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS products (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        price30 TEXT NOT NULL,
+        price40 TEXT NOT NULL,
+        price50 TEXT NOT NULL,
+        special_price TEXT NOT NULL,
+        remote_extra TEXT NOT NULL,
+        description TEXT NOT NULL,
+        technical TEXT NOT NULL,
+        main_image TEXT NOT NULL,
+        hover_images TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )`,
+    ),
+    runtime.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS admin_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )`,
+    ),
+  ]);
+}
+
+async function hashPassword(value: string) {
+  const data = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function authorize(request: Request) {
+  const supplied = request.headers.get("x-admin-password") || "";
+  if (!supplied) return false;
+
+  const suppliedHash = await hashPassword(supplied);
+  const saved = await runtime.DB.prepare(
+    "SELECT value FROM admin_settings WHERE key = 'password_hash'",
+  ).first<{ value: string }>();
+
+  if (!saved?.value) {
+    await runtime.DB.prepare(
+      `INSERT INTO admin_settings (key, value, updated_at)
+       VALUES ('password_hash', ?, CURRENT_TIMESTAMP)`,
+    )
+      .bind(suppliedHash)
+      .run();
+    return true;
+  }
+
+  return saved.value === suppliedHash;
 }
 
 function insertStatement(product: AdminProduct) {
@@ -88,8 +126,10 @@ function rowToProduct(row: Record<string, unknown>): AdminProduct {
 }
 
 export async function GET() {
-  await ensureTable();
-  const result = await runtime.DB.prepare("SELECT * FROM products ORDER BY rowid ASC").all<Record<string, unknown>>();
+  await ensureTables();
+  const result = await runtime.DB.prepare(
+    "SELECT * FROM products ORDER BY rowid ASC",
+  ).all<Record<string, unknown>>();
   const rows = result.results || [];
 
   if (rows.length === 0) {
@@ -105,32 +145,32 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  await ensureTable();
+  await ensureTables();
 
-  if (!runtime.ADMIN_PASSWORD) {
-    return NextResponse.json(
-      { error: "Yönetim şifresi Cloudflare üzerinde tanımlı değil." },
-      { status: 503 },
-    );
-  }
-
-  if (request.headers.get("x-admin-password") !== runtime.ADMIN_PASSWORD) {
+  if (!(await authorize(request))) {
     return NextResponse.json({ error: "Yönetim şifresi hatalı." }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null);
-  const products = (Array.isArray(body) ? body : body?.products) as AdminProduct[] | undefined;
+  const products = (Array.isArray(body) ? body : body?.products) as
+    | AdminProduct[]
+    | undefined;
 
   if (!Array.isArray(products) || products.length > 250) {
     return NextResponse.json({ error: "Geçersiz ürün verisi." }, { status: 400 });
   }
 
   const validProducts = products.filter(
-    (product) => product && typeof product.id === "string" && typeof product.title === "string",
+    (product) =>
+      product &&
+      typeof product.id === "string" &&
+      typeof product.title === "string",
   );
 
   await runtime.DB.prepare("DELETE FROM products").run();
-  if (validProducts.length) await runtime.DB.batch(validProducts.map(insertStatement));
+  if (validProducts.length) {
+    await runtime.DB.batch(validProducts.map(insertStatement));
+  }
 
   return NextResponse.json({ ok: true, count: validProducts.length });
 }
