@@ -2,11 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useRef, useState } from "react";
-import FormattedProductCopy, {
-  productCopyHtml,
-  sanitizeProductHtml,
-} from "../../../components/FormattedProductCopy";
+import { useState } from "react";
+import FormattedProductCopy from "../../../components/FormattedProductCopy";
 import {
   productId,
   readAdminProducts,
@@ -26,7 +23,9 @@ const categories = [
   "Ev Dekorasyon",
   "Ek Malzemeler",
 ];
+
 const technicalTemplate = `Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör`;
+
 type Draft = {
   title: string;
   category: string;
@@ -40,6 +39,7 @@ type Draft = {
   mainImage: string;
   hoverImages: string[];
 };
+
 const emptyDraft: Draft = {
   title: "",
   category: categories[0],
@@ -56,36 +56,22 @@ const emptyDraft: Draft = {
 
 export default function ProductEntryPage() {
   const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
-  const [draft, setDraft] = useState<Draft>(() => {
-    if (typeof window === "undefined") return emptyDraft;
-    try {
-      const stored = window.localStorage.getItem("3dbade-product-draft");
-      return stored ? { ...emptyDraft, ...JSON.parse(stored) } : emptyDraft;
-    } catch {
-      return emptyDraft;
-    }
-  });
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mainPreview, setMainPreview] = useState("");
-  const [hoverPreviews, setHoverPreviews] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
-  const descriptionRef = useRef<HTMLDivElement>(null);
+
   const update = (field: keyof Draft, value: string) =>
     setDraft((current) => ({ ...current, [field]: value }));
+
   function saveDraft() {
     if (!draft.title.trim()) return;
     const id = selectedId || productId(draft.title);
-    const description = sanitizeProductHtml(
-      descriptionRef.current?.innerHTML ?? draft.description,
-    );
     const product: AdminProduct = {
       ...draft,
-      description,
-      mainImage: mainPreview || draft.mainImage,
-      hoverImages: hoverPreviews.length ? hoverPreviews : draft.hoverImages,
       id,
       title: draft.title.trim(),
+      hoverImages: draft.hoverImages || [],
     };
     const next = selectedId
       ? products.map((item) => (item.id === id ? product : item))
@@ -94,22 +80,20 @@ export default function ProductEntryPage() {
     setSelectedId(id);
     setDraft(product);
     writeAdminProducts(next);
-    window.localStorage.setItem("3dbade-product-draft", JSON.stringify(product));
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2500);
   }
+
   function selectProduct(product: AdminProduct) {
     setSelectedId(product.id);
-    setDraft(product);
-    setMainPreview(product.mainImage || "");
-    setHoverPreviews(product.hoverImages || []);
+    setDraft({ ...product, hoverImages: product.hoverImages || [] });
   }
+
   function newProduct() {
     setSelectedId(null);
     setDraft(emptyDraft);
-    setMainPreview("");
-    setHoverPreviews([]);
   }
+
   function deleteProduct() {
     const product = products.find((item) => item.id === selectedId);
     if (!product || !window.confirm(`“${product.title}” silinsin mi?`)) return;
@@ -118,22 +102,22 @@ export default function ProductEntryPage() {
     writeAdminProducts(next);
     newProduct();
   }
+
   function openPreview() {
-    const description = sanitizeProductHtml(
-      descriptionRef.current?.innerHTML ?? draft.description,
-    );
     window.localStorage.setItem(
       "3dbade-product-preview",
-      JSON.stringify({ ...draft, description, mainPreview, hoverPreviews }),
+      JSON.stringify({ ...draft, mainPreview: draft.mainImage, hoverPreviews: draft.hoverImages }),
     );
     window.open("/yonetim/urun-onizleme", "_blank");
   }
+
   async function copyDetails() {
     const content = `ÜRÜN ADI: ${draft.title || "-"}\nKATEGORİ: ${draft.category}\n30 CM: ${draft.price30 || "-"}\n40 CM: ${draft.price40 || "-"}\n50 CM: ${draft.price50 || "-"}\nÖZEL ÖLÇÜ: ${draft.specialPrice || "Teklif al"}\nKUMANDALI EK FİYAT: ${draft.remoteExtra || "0"} TL\n\nÜRÜN AÇIKLAMASI\n${draft.description || "-"}\n\nTEKNİK ÖZELLİKLER\n${draft.technical}`;
     await navigator.clipboard.writeText(content);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2500);
   }
+
   function readImage(file: File) {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -158,38 +142,69 @@ export default function ProductEntryPage() {
       reader.readAsDataURL(file);
     });
   }
-  function saveSelectedImages(mainImage: string, hoverImages: string[]) {
-    if (!selectedId) return;
-    const next = products.map((product) =>
-      product.id === selectedId ? { ...product, mainImage, hoverImages } : product,
-    );
-    setProducts(next);
-    writeAdminProducts(next);
-  }
+
   async function preview(files: FileList | null, target: "main" | "hover") {
     if (!files?.length) return;
     const images = await Promise.all(Array.from(files).map(readImage));
     if (target === "main") {
-      setMainPreview(images[0]);
-      saveSelectedImages(images[0], hoverPreviews);
+      setDraft((current) => ({ ...current, mainImage: images[0] }));
       return;
     }
-    setHoverPreviews((current) => {
-      const next = [...current, ...images];
-      saveSelectedImages(mainPreview, next);
-      return next;
+    setDraft((current) => ({
+      ...current,
+      hoverImages: [...(current.hoverImages || []), ...images],
+    }));
+  }
+
+  function removeMainImage() {
+    setDraft((current) => ({ ...current, mainImage: "" }));
+  }
+
+  function removeHoverImage(index: number) {
+    setDraft((current) => ({
+      ...current,
+      hoverImages: current.hoverImages.filter((_, itemIndex) => itemIndex !== index),
+    }));
+  }
+
+  function makeMainImage(index: number) {
+    setDraft((current) => {
+      const selected = current.hoverImages[index];
+      if (!selected) return current;
+      const remaining = current.hoverImages.filter((_, itemIndex) => itemIndex !== index);
+      const nextHover = current.mainImage ? [current.mainImage, ...remaining] : remaining;
+      return { ...current, mainImage: selected, hoverImages: nextHover };
     });
   }
+
+  function moveHover(index: number, direction: -1 | 1) {
+    setDraft((current) => {
+      const next = [...current.hoverImages];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return current;
+      [next[index], next[target]] = [next[target], next[index]];
+      return { ...current, hoverImages: next };
+    });
+  }
+
+  const imageButtonStyle = {
+    padding: "8px 10px",
+    borderRadius: "8px",
+    border: "1px solid #d5d5d5",
+    background: "white",
+    cursor: "pointer",
+    fontWeight: 700,
+    fontSize: "12px",
+  } as const;
 
   return (
     <main className="product-entry-page">
       <section className="product-entry-heading">
         <p>ÜRÜN YÖNETİMİ</p>
         <h1>Ürünlerini yönet.</h1>
-        <span>
-          Yeni ürün ekle, mevcut ürünü seçip değiştir veya gerektiğinde sil.
-        </span>
+        <span>Yeni ürün ekle, mevcut ürünü değiştir, görselleri sırala veya sil.</span>
       </section>
+
       <section className="product-entry-grid product-management-grid">
         <aside className="managed-products">
           <div>
@@ -210,166 +225,110 @@ export default function ProductEntryPage() {
             ))}
           </div>
         </aside>
+
         <div className="entry-form">
           <div className="entry-form-title">
             <b>{selectedId ? "ÜRÜNÜ DÜZENLİYORSUN" : "YENİ ÜRÜN"}</b>
             {selectedId && <button onClick={deleteProduct}>ÜRÜNÜ SİL</button>}
           </div>
+
           <label>
             Ürün adı
-            <input
-              value={draft.title}
-              onChange={(event) => update("title", event.target.value)}
-              placeholder="Örn. Hamburger Neon"
-            />
+            <input value={draft.title} onChange={(event) => update("title", event.target.value)} />
           </label>
+
           <label>
             Kategori
-            <select
-              value={draft.category}
-              onChange={(event) => update("category", event.target.value)}
-            >
-              {categories.map((category) => (
-                <option key={category}>{category}</option>
-              ))}
+            <select value={draft.category} onChange={(event) => update("category", event.target.value)}>
+              {categories.map((category) => <option key={category}>{category}</option>)}
             </select>
           </label>
+
           <div className="entry-prices">
-            <label>
-              30 cm fiyatı
-              <input
-                inputMode="numeric"
-                value={draft.price30}
-                onChange={(event) => update("price30", event.target.value)}
-                placeholder="₺"
-              />
-            </label>
-            <label>
-              40 cm fiyatı
-              <input
-                inputMode="numeric"
-                value={draft.price40}
-                onChange={(event) => update("price40", event.target.value)}
-                placeholder="₺"
-              />
-            </label>
-            <label>
-              50 cm fiyatı
-              <input
-                inputMode="numeric"
-                value={draft.price50}
-                onChange={(event) => update("price50", event.target.value)}
-                placeholder="₺"
-              />
-            </label>
-            <label>
-              Özel ölçü
-              <input
-                value={draft.specialPrice}
-                onChange={(event) => update("specialPrice", event.target.value)}
-              />
-            </label>
+            <label>30 cm fiyatı<input inputMode="numeric" value={draft.price30} onChange={(event) => update("price30", event.target.value)} /></label>
+            <label>40 cm fiyatı<input inputMode="numeric" value={draft.price40} onChange={(event) => update("price40", event.target.value)} /></label>
+            <label>50 cm fiyatı<input inputMode="numeric" value={draft.price50} onChange={(event) => update("price50", event.target.value)} /></label>
+            <label>Özel ölçü<input value={draft.specialPrice} onChange={(event) => update("specialPrice", event.target.value)} /></label>
           </div>
+
           <label>
             Kumandalı ek fiyatı
-            <input
-              inputMode="numeric"
-              value={draft.remoteExtra}
-              onChange={(event) => update("remoteExtra", event.target.value)}
-              placeholder="₺"
+            <input inputMode="numeric" value={draft.remoteExtra} onChange={(event) => update("remoteExtra", event.target.value)} />
+          </label>
+
+          <label>
+            Ürün açıklaması
+            <textarea
+              style={{ minHeight: 320, lineHeight: 1.55 }}
+              value={draft.description}
+              onChange={(event) => update("description", event.target.value)}
+              placeholder="Ürün açıklamasını buradan doğrudan değiştir."
             />
           </label>
-          <div className="entry-description-editor">
-            <label>Ürün açıklaması</label>
-            <div
-              className="entry-description-field product-full-description"
-              contentEditable
-              suppressContentEditableWarning
-              data-placeholder="Açıklamayı doğrudan buraya yapıştır. Kalın, italik, büyük yazı ve paragraflar korunur."
-              dangerouslySetInnerHTML={{
-                __html: productCopyHtml(draft.description),
-              }}
-              ref={descriptionRef}
-              onBlur={(event) =>
-                update(
-                  "description",
-                  sanitizeProductHtml(event.currentTarget.innerHTML),
-                )
-              }
-            />
-          </div>
-          <div
-            className="entry-description-preview product-content-area product-full-description"
-            aria-live="polite"
-          >
+
+          <div className="entry-description-preview product-content-area product-full-description" aria-live="polite">
             <p>ÜRÜN SAYFASI ÖNİZLEMESİ</p>
             <div className="product-copy-preview">
-              <FormattedProductCopy
-                content={
-                  draft.description ||
-                  "Yapıştırdığın ürün açıklaması burada Eriyen Dondurma ürün sayfasındaki yazı düzeniyle görünür."
-                }
-              />
+              <FormattedProductCopy content={draft.description || "Ürün açıklaması burada görünecek."} />
             </div>
           </div>
+
           <label>
             Teknik özellikler
-            <textarea
-              value={draft.technical}
-              onChange={(event) => update("technical", event.target.value)}
-            />
+            <textarea value={draft.technical} onChange={(event) => update("technical", event.target.value)} />
           </label>
+
           <div className="entry-buttons">
-            <button onClick={saveDraft}>
-              {selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}
-            </button>
-            <button className="entry-preview" onClick={openPreview}>
-              CANLI ÖNİZLEME
-            </button>
-            <button className="entry-copy" onClick={copyDetails}>
-              {copied ? "KOPYALANDI ✓" : "BİLGİLERİ KOPYALA"}
-            </button>
+            <button onClick={saveDraft}>{selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}</button>
+            <button className="entry-preview" onClick={openPreview}>CANLI ÖNİZLEME</button>
+            <button className="entry-copy" onClick={copyDetails}>{copied ? "KOPYALANDI ✓" : "BİLGİLERİ KOPYALA"}</button>
           </div>
-          {saved && (
-            <small className="entry-saved">
-              Kaydedildi. Fiyatlar sayfasına otomatik eklendi.
-            </small>
-          )}
+
+          {saved && <small className="entry-saved">Kaydedildi.</small>}
         </div>
+
         <aside className="entry-images">
           <b>Ürün görselleri</b>
-          <span>
-            Bir ana görsel ve istediğin kadar hover görseli ekle. Hover alanına
-            her yeni seçimin önceki görsellere eklenir.
-          </span>
-          <label className="entry-upload">
-            ANA GÖRSEL
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(event) => preview(event.target.files, "main")}
-            />
-          </label>
-          {mainPreview && <img src={mainPreview} alt="Ana görsel önizlemesi" />}
-          <label className="entry-upload">
-            HOVER GÖRSELİ EKLE
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(event) => preview(event.target.files, "hover")}
-            />
-          </label>
-          {hoverPreviews.map((image, index) => (
-            <img
-              key={image}
-              src={image}
-              alt={`${index + 1}. hover görseli önizlemesi`}
-            />
-          ))}
-          <small>
-            Görselleri sohbetten ayrıca gönder; buradaki önizleme sadece
-            hazırlık içindir.
+          <span><strong>Ana görsel</strong> mağaza kartında ilk görünen görseldir. <strong>Ek / hover görseller</strong> ürün galerisindeki diğer görsellerdir.</span>
+
+          <div style={{ border: "2px solid #111", borderRadius: 14, padding: 12, marginTop: 10 }}>
+            <b>1. ANA GÖRSEL</b>
+            <label className="entry-upload" style={{ marginTop: 10 }}>
+              ANA GÖRSELİ DEĞİŞTİR
+              <input type="file" accept="image/*" onChange={(event) => preview(event.target.files, "main")} />
+            </label>
+            {draft.mainImage ? (
+              <>
+                <img src={draft.mainImage} alt="Ana görsel" />
+                <button type="button" style={{ ...imageButtonStyle, width: "100%", marginTop: 8 }} onClick={removeMainImage}>ANA GÖRSELİ SİL</button>
+              </>
+            ) : <small>Ana görsel yok.</small>}
+          </div>
+
+          <div style={{ border: "1px solid #ccc", borderRadius: 14, padding: 12, marginTop: 14 }}>
+            <b>2. EK / HOVER GÖRSELLER</b>
+            <label className="entry-upload" style={{ marginTop: 10 }}>
+              YENİ GÖRSEL EKLE
+              <input type="file" accept="image/*" multiple onChange={(event) => preview(event.target.files, "hover")} />
+            </label>
+
+            {draft.hoverImages.length === 0 && <small>Ek görsel yok.</small>}
+            {draft.hoverImages.map((image, index) => (
+              <div key={`${image}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
+                <b>{index + 1}. EK GÖRSEL</b>
+                <img src={image} alt={`${index + 1}. ek görsel`} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 8 }}>
+                  <button type="button" style={imageButtonStyle} onClick={() => makeMainImage(index)}>ANA GÖRSEL YAP</button>
+                  <button type="button" style={imageButtonStyle} onClick={() => removeHoverImage(index)}>SİL</button>
+                  <button type="button" style={imageButtonStyle} disabled={index === 0} onClick={() => moveHover(index, -1)}>YUKARI</button>
+                  <button type="button" style={imageButtonStyle} disabled={index === draft.hoverImages.length - 1} onClick={() => moveHover(index, 1)}>AŞAĞI</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <small style={{ marginTop: 12 }}>
+            Değişikliklerden sonra mutlaka “DEĞİŞİKLİKLERİ KAYDET” butonuna bas.
           </small>
         </aside>
       </section>
