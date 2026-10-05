@@ -19,7 +19,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.62.5",
+    "@cloudflare/vite-plugin": "^2.0.0-beta.sha-52b0dc0e9",
     "@cloudflare/workers-response-store": "^1.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -35,7 +35,7 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vinext": "^1.0.1",
-    "vite": "^8.3.2",
+    "vite": "^8.3.0",
     "wrangler": "^4.147.0"
   },
   "type": "module"
