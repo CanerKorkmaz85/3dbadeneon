@@ -87,6 +87,8 @@ function run(command, args) {
   });
 }
 
+const git = process.platform === "win32" ? "git.exe" : "git";
+
 const server = http.createServer(async (req, res) => {
   const origin = req.headers.origin;
   if (req.method === "OPTIONS") {
@@ -117,19 +119,42 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.url === "/publish" && req.method === "POST") {
-      await run(process.platform === "win32" ? "git.exe" : "git", ["add", "-A"]);
-      const diff = await run(process.platform === "win32" ? "git.exe" : "git", ["diff", "--cached", "--name-only"]);
-      if (!diff.stdout.trim()) return send(res, 200, { ok: true, changed: false, message: "Yayınlanacak yeni değişiklik yok." }, origin);
-      const stamp = new Date().toLocaleString("tr-TR").replace(/[/:]/g, "-");
-      await run(process.platform === "win32" ? "git.exe" : "git", ["commit", "-m", `Siteyi yayinla ${stamp}`]);
-      await run(process.platform === "win32" ? "git.exe" : "git", ["push", "origin", "main"]);
-      return send(res, 200, { ok: true, changed: true, message: "GitHub'a gönderildi. Cloudflare otomatik yayına alacak." }, origin);
+      await run(git, ["add", "-A"]);
+      const diff = await run(git, ["diff", "--cached", "--name-only"]);
+
+      if (diff.stdout.trim()) {
+        const stamp = new Date().toLocaleString("tr-TR").replace(/[/:]/g, "-");
+        await run(git, ["commit", "-m", `Siteyi yayinla ${stamp}`]);
+      }
+
+      await run(git, ["pull", "--rebase", "origin", "main"]);
+
+      const ahead = await run(git, ["rev-list", "--count", "origin/main..HEAD"]);
+      if (!Number(ahead.stdout.trim() || "0")) {
+        return send(res, 200, {
+          ok: true,
+          changed: false,
+          message: "GitHub ile esitlendi. Yayinlanacak yeni degisiklik yok.",
+        }, origin);
+      }
+
+      await run(git, ["push", "origin", "main"]);
+      return send(res, 200, {
+        ok: true,
+        changed: true,
+        message: "GitHub guncellendi. Cloudflare otomatik yayina alacak.",
+      }, origin);
     }
 
     return send(res, 404, { error: "Bulunamadı." }, origin);
   } catch (error) {
     console.error(error);
-    return send(res, 500, { error: error instanceof Error ? error.message : "İşlem başarısız." }, origin);
+    return send(res, 500, {
+      error:
+        error instanceof Error
+          ? error.message
+          : "İşlem başarısız.",
+    }, origin);
   }
 });
 
