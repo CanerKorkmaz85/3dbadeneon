@@ -8,6 +8,17 @@ import { useEffect, useMemo, useState } from "react";
 import FormattedProductCopy from "../../../components/FormattedProductCopy";
 import { createEmptyProduct, readAdminProducts, type AdminProduct } from "../../../lib/admin-products";
 
+async function loadProducts(): Promise<AdminProduct[]> {
+  try {
+    const response = await fetch(`/data/products.json?t=${Date.now()}`, { cache: "no-store" });
+    if (response.ok) return (await response.json()) as AdminProduct[];
+  } catch {}
+
+  const fallback = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
+  if (!fallback.ok) throw new Error("Ürün verisi alınamadı.");
+  return (await fallback.json()) as AdminProduct[];
+}
+
 export default function ManagedProductPage() {
   const params = useParams<{ id: string }>();
   const [product, setProduct] = useState<AdminProduct | null>(null);
@@ -20,9 +31,7 @@ export default function ManagedProductPage() {
     let cancelled = false;
     async function load() {
       try {
-        const response = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error("Ürün verisi alınamadı.");
-        const products = (await response.json()) as AdminProduct[];
+        const products = await loadProducts();
         const found = products.find((item) => item.id === params.id) || null;
         if (!cancelled) setProduct(found);
       } catch {
@@ -31,9 +40,7 @@ export default function ManagedProductPage() {
       }
     }
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [params.id]);
 
   const images = useMemo(() => product ? [product.mainImage, ...product.hoverImages].filter(Boolean) : [], [product]);
