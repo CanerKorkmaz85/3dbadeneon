@@ -65,7 +65,7 @@ export default function HomeLinkFixes() {
     });
 
     const designRequest = document.querySelector("#ozel-tasarim .personal-copy a");
-    if (designRequest instanceof HTMLAnchorElement) designRequest.href = "#tasarla";
+    if (designRequest instanceof HTMLAnchorElement) designRequest.href = "/tasarla";
 
     const hero = document.querySelector(".team-video") as HTMLElement | null;
     const goTeams = () => {
