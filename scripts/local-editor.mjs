@@ -136,10 +136,3 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, "127.0.0.1", () => {
   console.log(`3Dbade yerel editor servisi: http://127.0.0.1:${port}`);
 });
-
-const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-const next = spawn(npm, ["run", "dev:next"], { cwd: root, stdio: "inherit", shell: false });
-next.on("exit", (code) => {
-  server.close();
-  process.exit(code ?? 0);
-});
