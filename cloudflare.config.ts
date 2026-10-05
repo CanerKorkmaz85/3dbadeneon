@@ -11,7 +11,7 @@ export default defineConfig({
     },
     env: {
       ASSETS: bindings.assets(),
-      DB: bindings.d1({ name: "3dbadeneon-db" }),
+      DB: bindings.d1({ name: "3dbadeneon-products-db" }),
       PRODUCT_IMAGES: bindings.r2({ name: "3dbadeneon-product-images" }),
     },
   }),
