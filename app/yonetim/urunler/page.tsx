@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useRef, useState } from "react";
-import FormattedProductCopy, {
+import {
   productCopyHtml,
   sanitizeProductHtml,
 } from "../../../components/FormattedProductCopy";
@@ -65,8 +65,14 @@ export default function ProductEntryPage() {
   const [message, setMessage] = useState("");
   const descriptionRef = useRef<HTMLDivElement>(null);
 
-  const update = (field: keyof Draft, value: string | string[]) =>
+  function update(field: keyof Draft, value: string | string[]) {
     setDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function flash(text: string) {
+    setMessage(text);
+    window.setTimeout(() => setMessage(""), 3000);
+  }
 
   function currentDescription() {
     return sanitizeProductHtml(
@@ -74,17 +80,11 @@ export default function ProductEntryPage() {
     );
   }
 
-  function flash(text: string) {
-    setMessage(text);
-    window.setTimeout(() => setMessage(""), 3500);
-  }
-
-  function saveDraft() {
+  function buildProduct() {
     if (!draft.title.trim()) {
       flash("Ürün adı boş olamaz.");
-      return;
+      return null;
     }
-
     const id = selectedId || productId(draft.title);
     const product: AdminProduct = {
       ...draft,
@@ -96,20 +96,30 @@ export default function ProductEntryPage() {
     const next = selectedId
       ? products.map((item) => (item.id === id ? product : item))
       : [...products, product];
+    return { id, product, next };
+  }
 
+  function persist(showMessage = true) {
+    const built = buildProduct();
+    if (!built) return null;
     try {
-      // Eski deneme kayıtları aynı depolama alanını gereksiz yere doldurabiliyor.
-      window.localStorage.removeItem("3dbade-product-draft");
-      window.localStorage.removeItem("3dbade-product-preview");
-      writeAdminProducts(next);
-      setProducts(next);
-      setSelectedId(id);
-      setDraft(product);
-      flash("Kaydedildi ✓");
+      writeAdminProducts(built.next);
+      setProducts(built.next);
+      setSelectedId(built.id);
+      setDraft(built.product);
+      if (showMessage) flash("Kaydedildi ✓");
+      return built.id;
     } catch (error) {
       console.error(error);
-      flash("Kaydedilemedi. Tarayıcı depolama alanı dolmuş olabilir.");
+      flash("Kaydedilemedi. Görseller fazla büyük olabilir.");
+      return null;
     }
+  }
+
+  function saveAndView() {
+    const id = persist(false);
+    if (!id) return;
+    window.location.href = `/urunler/${id}`;
   }
 
   function selectProduct(product: AdminProduct) {
@@ -139,50 +149,23 @@ export default function ProductEntryPage() {
     const product = products.find((item) => item.id === selectedId);
     if (!product || !window.confirm(`“${product.title}” silinsin mi?`)) return;
     const next = products.filter((item) => item.id !== product.id);
-    try {
-      writeAdminProducts(next);
-      setProducts(next);
-      newProduct();
-      flash("Ürün silindi.");
-    } catch (error) {
-      console.error(error);
-      flash("Ürün silinemedi.");
-    }
-  }
-
-  function openPreview() {
-    const payload = {
-      ...draft,
-      description: currentDescription(),
-      mainPreview: draft.mainImage,
-      hoverPreviews: draft.hoverImages,
-    };
-
-    try {
-      // Önizlemeyi localStorage'a ikinci kez kopyalamak depolama kotasını dolduruyordu.
-      // sessionStorage kullanınca kaydetme ile çakışmıyor.
-      window.sessionStorage.setItem(
-        "3dbade-product-preview",
-        JSON.stringify(payload),
-      );
-      const previewWindow = window.open(
-        "/yonetim/urun-onizleme",
-        "3dbade-product-preview",
-      );
-      if (!previewWindow) {
-        flash("Tarayıcı önizleme penceresini engelledi.");
-        return;
-      }
-      previewWindow.focus();
-    } catch (error) {
-      console.error(error);
-      flash("Önizleme açılamadı. Görseller çok büyük olabilir.");
-    }
+    writeAdminProducts(next);
+    setProducts(next);
+    newProduct();
+    flash("Ürün silindi.");
   }
 
   function formatText(command: string, value?: string) {
     descriptionRef.current?.focus();
     document.execCommand(command, false, value);
+  }
+
+  function handlePaste(event: React.ClipboardEvent<HTMLDivElement>) {
+    event.preventDefault();
+    const html = event.clipboardData.getData("text/html");
+    const text = event.clipboardData.getData("text/plain");
+    const content = html ? sanitizeProductHtml(html) : productCopyHtml(text);
+    document.execCommand("insertHTML", false, content);
   }
 
   function readImage(file: File) {
@@ -192,8 +175,7 @@ export default function ProductEntryPage() {
         const source = String(reader.result || "");
         const image = new Image();
         image.onload = () => {
-          // Tarayıcı hafızasını taşırmamak için yüklenen görselleri küçült.
-          const limit = 900;
+          const limit = 720;
           const scale = Math.min(1, limit / Math.max(image.width, image.height));
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.round(image.width * scale));
@@ -201,7 +183,7 @@ export default function ProductEntryPage() {
           const context = canvas.getContext("2d");
           if (!context) return resolve(source);
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", 0.68));
+          resolve(canvas.toDataURL("image/jpeg", 0.62));
         };
         image.onerror = () => reject(new Error("Görsel okunamadı."));
         image.src = source;
@@ -211,38 +193,30 @@ export default function ProductEntryPage() {
     });
   }
 
-  async function preview(files: FileList | null, target: "main" | "hover") {
+  async function addImages(files: FileList | null, target: "main" | "hover") {
     if (!files?.length) return;
     try {
       const images = await Promise.all(Array.from(files).map(readImage));
-      if (target === "main") {
-        update("mainImage", images[0]);
-      } else {
-        update("hoverImages", [...draft.hoverImages, ...images]);
-      }
-    } catch (error) {
-      console.error(error);
+      if (target === "main") update("mainImage", images[0]);
+      else update("hoverImages", [...draft.hoverImages, ...images]);
+    } catch {
       flash("Görsel okunamadı.");
     }
   }
 
-  function removeMainImage() {
-    update("mainImage", "");
-  }
-
-  function removeHoverImage(index: number) {
+  function removeHover(index: number) {
     update(
       "hoverImages",
       draft.hoverImages.filter((_, itemIndex) => itemIndex !== index),
     );
   }
 
-  function makeMainImage(index: number) {
+  function makeMain(index: number) {
     const selected = draft.hoverImages[index];
     if (!selected) return;
     const remaining = draft.hoverImages.filter((_, itemIndex) => itemIndex !== index);
-    update("mainImage", selected);
     update("hoverImages", draft.mainImage ? [draft.mainImage, ...remaining] : remaining);
+    update("mainImage", selected);
   }
 
   function moveHover(index: number, direction: -1 | 1) {
@@ -253,23 +227,14 @@ export default function ProductEntryPage() {
     update("hoverImages", next);
   }
 
-  const imageButtonStyle = {
+  const smallButton = {
     padding: "8px 10px",
-    borderRadius: "8px",
     border: "1px solid #d5d5d5",
+    borderRadius: 8,
     background: "white",
     cursor: "pointer",
     fontWeight: 700,
-    fontSize: "12px",
-  } as const;
-
-  const toolbarButtonStyle = {
-    padding: "7px 10px",
-    border: "1px solid #ccc",
-    borderRadius: 7,
-    background: "#fff",
-    cursor: "pointer",
-    fontWeight: 700,
+    fontSize: 12,
   } as const;
 
   return (
@@ -277,7 +242,7 @@ export default function ProductEntryPage() {
       <section className="product-entry-heading">
         <p>ÜRÜN YÖNETİMİ</p>
         <h1>Ürünlerini yönet.</h1>
-        <span>Ürün ekle, düzenle, görselleri sırala veya sil.</span>
+        <span>Kaydet ve doğrudan yayındaki ürün sayfasında gör.</span>
       </section>
 
       <section className="product-entry-grid product-management-grid">
@@ -291,8 +256,8 @@ export default function ProductEntryPage() {
             {products.map((product) => (
               <button
                 type="button"
-                className={selectedId === product.id ? "selected" : ""}
                 key={product.id}
+                className={selectedId === product.id ? "selected" : ""}
                 onClick={() => selectProduct(product)}
               >
                 <b>{product.title}</b>
@@ -308,82 +273,81 @@ export default function ProductEntryPage() {
             {selectedId && <button type="button" onClick={deleteProduct}>ÜRÜNÜ SİL</button>}
           </div>
 
-          <label>Ürün adı<input value={draft.title} onChange={(event) => update("title", event.target.value)} /></label>
-          <label>Kategori<select value={draft.category} onChange={(event) => update("category", event.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
+          <label>Ürün adı<input value={draft.title} onChange={(e) => update("title", e.target.value)} /></label>
+          <label>Kategori<select value={draft.category} onChange={(e) => update("category", e.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
 
           <div className="entry-prices">
-            <label>30 cm fiyatı<input inputMode="numeric" value={draft.price30} onChange={(event) => update("price30", event.target.value)} /></label>
-            <label>40 cm fiyatı<input inputMode="numeric" value={draft.price40} onChange={(event) => update("price40", event.target.value)} /></label>
-            <label>50 cm fiyatı<input inputMode="numeric" value={draft.price50} onChange={(event) => update("price50", event.target.value)} /></label>
-            <label>Özel ölçü<input value={draft.specialPrice} onChange={(event) => update("specialPrice", event.target.value)} /></label>
+            <label>30 cm fiyatı<input value={draft.price30} onChange={(e) => update("price30", e.target.value)} /></label>
+            <label>40 cm fiyatı<input value={draft.price40} onChange={(e) => update("price40", e.target.value)} /></label>
+            <label>50 cm fiyatı<input value={draft.price50} onChange={(e) => update("price50", e.target.value)} /></label>
+            <label>Özel ölçü<input value={draft.specialPrice} onChange={(e) => update("specialPrice", e.target.value)} /></label>
           </div>
 
-          <label>Kumandalı ek fiyatı<input inputMode="numeric" value={draft.remoteExtra} onChange={(event) => update("remoteExtra", event.target.value)} /></label>
+          <label>Kumandalı ek fiyatı<input value={draft.remoteExtra} onChange={(e) => update("remoteExtra", e.target.value)} /></label>
 
           <div className="entry-description-editor">
             <label>Ürün açıklaması</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: 9, border: "1px solid #ddd", borderBottom: 0, borderRadius: "10px 10px 0 0", background: "#f8f8f8" }}>
-              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("bold")}>B</button>
-              <button type="button" style={{ ...toolbarButtonStyle, fontStyle: "italic" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("italic")}>I</button>
-              <button type="button" style={{ ...toolbarButtonStyle, textDecoration: "underline" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("underline")}>U</button>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: 9, border: "1px solid #ddd", borderBottom: 0, background: "#f8f8f8" }}>
+              <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("bold")}>B</button>
+              <button type="button" style={{ ...smallButton, fontStyle: "italic" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("italic")}>I</button>
+              <button type="button" style={{ ...smallButton, textDecoration: "underline" }} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("underline")}>U</button>
               <select defaultValue="p" onChange={(e) => formatText("formatBlock", e.target.value)}><option value="p">Normal</option><option value="h2">Başlık</option><option value="h3">Alt başlık</option><option value="blockquote">Alıntı</option></select>
               <select defaultValue="3" onChange={(e) => formatText("fontSize", e.target.value)}><option value="2">Küçük</option><option value="3">Normal</option><option value="4">Büyük</option><option value="5">Çok büyük</option></select>
-              <select defaultValue="Arial" onChange={(e) => formatText("fontName", e.target.value)}><option>Arial</option><option>Georgia</option><option>Trebuchet MS</option><option>Verdana</option><option>Times New Roman</option></select>
-              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertUnorderedList")}>• Liste</button>
-              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertOrderedList")}>1. Liste</button>
-              <button type="button" style={toolbarButtonStyle} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("removeFormat")}>Biçimi temizle</button>
+              <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertUnorderedList")}>• Liste</button>
+              <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("insertOrderedList")}>1. Liste</button>
+              <button type="button" style={smallButton} onMouseDown={(e) => e.preventDefault()} onClick={() => formatText("removeFormat")}>Biçimi temizle</button>
             </div>
             <div
-              key={selectedId || "new-product"}
+              key={selectedId || "new"}
               ref={descriptionRef}
               className="entry-description-field product-full-description"
               contentEditable
               suppressContentEditableWarning
-              style={{ minHeight: 340, borderRadius: "0 0 10px 10px", padding: 16, outline: "none", background: "white" }}
+              style={{ minHeight: 340, padding: 16, outline: "none", background: "white" }}
               dangerouslySetInnerHTML={{ __html: productCopyHtml(draft.description) }}
-              onBlur={(event) => update("description", sanitizeProductHtml(event.currentTarget.innerHTML))}
+              onPaste={handlePaste}
+              onBlur={(e) => update("description", sanitizeProductHtml(e.currentTarget.innerHTML))}
             />
           </div>
 
-          <div className="entry-description-preview product-content-area product-full-description">
-            <p>ÜRÜN SAYFASI ÖNİZLEMESİ</p>
-            <div className="product-copy-preview">
-              <FormattedProductCopy content={draft.description || "Ürün açıklaması burada görünecek."} />
-            </div>
-          </div>
-
-          <label>Teknik özellikler<textarea value={draft.technical} onChange={(event) => update("technical", event.target.value)} /></label>
+          <label>Teknik özellikler<textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} /></label>
 
           <div className="entry-buttons">
-            <button type="button" onClick={saveDraft}>{selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}</button>
-            <button type="button" className="entry-preview" onClick={openPreview}>CANLI ÖNİZLEME</button>
+            <button type="button" onClick={() => persist()}>{selectedId ? "DEĞİŞİKLİKLERİ KAYDET" : "ÜRÜNÜ KAYDET"}</button>
+            <button type="button" className="entry-preview" onClick={saveAndView}>KAYDET VE SİTEDE GÖR</button>
           </div>
           {message && <small className="entry-saved">{message}</small>}
         </div>
 
         <aside className="entry-images">
           <b>Ürün görselleri</b>
-          <span><strong>Ana görsel</strong> ilk görünen görseldir. <strong>Ek / hover görseller</strong> galerideki diğer görsellerdir.</span>
+          <span>Ana görsel ve galeri görsellerini buradan yönet.</span>
 
           <div style={{ border: "2px solid #111", borderRadius: 14, padding: 12, marginTop: 10 }}>
-            <b>1. ANA GÖRSEL</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>ANA GÖRSELİ DEĞİŞTİR<input type="file" accept="image/*" onChange={(event) => preview(event.target.files, "main")} /></label>
-            {draft.mainImage ? <><img src={draft.mainImage} alt="Ana görsel" /><button type="button" style={{ ...imageButtonStyle, width: "100%", marginTop: 8 }} onClick={removeMainImage}>ANA GÖRSELİ SİL</button></> : <small>Ana görsel yok.</small>}
+            <b>ANA GÖRSEL</b>
+            <label className="entry-upload" style={{ marginTop: 10 }}>
+              ANA GÖRSELİ DEĞİŞTİR
+              <input type="file" accept="image/*" onChange={(e) => addImages(e.target.files, "main")} />
+            </label>
+            {draft.mainImage ? <><img src={draft.mainImage} alt="Ana görsel" /><button type="button" style={{ ...smallButton, width: "100%", marginTop: 8 }} onClick={() => update("mainImage", "")}>ANA GÖRSELİ SİL</button></> : <small>Ana görsel yok.</small>}
           </div>
 
           <div style={{ border: "1px solid #ccc", borderRadius: 14, padding: 12, marginTop: 14 }}>
-            <b>2. EK / HOVER GÖRSELLER</b>
-            <label className="entry-upload" style={{ marginTop: 10 }}>YENİ GÖRSEL EKLE<input type="file" accept="image/*" multiple onChange={(event) => preview(event.target.files, "hover")} /></label>
-            {draft.hoverImages.length === 0 && <small>Ek görsel yok.</small>}
+            <b>EK / GALERİ GÖRSELLERİ</b>
+            <label className="entry-upload" style={{ marginTop: 10 }}>
+              YENİ GÖRSEL EKLE
+              <input type="file" accept="image/*" multiple onChange={(e) => addImages(e.target.files, "hover")} />
+            </label>
+
             {draft.hoverImages.map((image, index) => (
-              <div key={`${image.slice(0, 60)}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
-                <b>{index + 1}. EK GÖRSEL</b>
+              <div key={`${image}-${index}`} style={{ borderTop: "1px solid #e5e5e5", paddingTop: 12, marginTop: 12 }}>
+                <b>{index + 1}. GÖRSEL</b>
                 <img src={image} alt={`${index + 1}. ek görsel`} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 8 }}>
-                  <button type="button" style={imageButtonStyle} onClick={() => makeMainImage(index)}>ANA GÖRSEL YAP</button>
-                  <button type="button" style={imageButtonStyle} onClick={() => removeHoverImage(index)}>SİL</button>
-                  <button type="button" style={imageButtonStyle} disabled={index === 0} onClick={() => moveHover(index, -1)}>YUKARI</button>
-                  <button type="button" style={imageButtonStyle} disabled={index === draft.hoverImages.length - 1} onClick={() => moveHover(index, 1)}>AŞAĞI</button>
+                  <button type="button" style={smallButton} onClick={() => makeMain(index)}>ANA GÖRSEL YAP</button>
+                  <button type="button" style={smallButton} onClick={() => removeHover(index)}>SİL</button>
+                  <button type="button" style={smallButton} disabled={index === 0} onClick={() => moveHover(index, -1)}>YUKARI</button>
+                  <button type="button" style={smallButton} disabled={index === draft.hoverImages.length - 1} onClick={() => moveHover(index, 1)}>AŞAĞI</button>
                 </div>
               </div>
             ))}
