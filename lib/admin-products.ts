@@ -87,33 +87,38 @@ const productNames = [
   ["kapali-neon", "Kapalı Neon", "Kafe & Restoranlar"],
 ] as const;
 
+function defaultDescription(title: string, category: string) {
+  if (title === "Köpek Patron Neon LED") return dogPatronDescription;
+  return `# ${title}\n\n**Mekanına güçlü, modern ve dikkat çekici bir ışık dokunuşu kat.**\n\n**${title}**, 3Dbade Neon özel serisinde ${category.toLocaleLowerCase("tr-TR")} için tasarlanmış dekoratif bir neon LED üründür. Canlı ışık etkisiyle duvar, vitrin, çalışma alanı veya konsept köşelerde güçlü bir odak noktası oluşturur.\n\nYeni nesil esnek silikon neon LED teknolojisi sayesinde klasik cam neona göre daha dayanıklı, düşük enerji tüketimli ve güvenli kullanım sunar. Şeffaf pleksi taşıyıcı ile temiz ve modern bir görünüm elde edilir.\n\n### 🛠️ Teknik Özellikler\n\n- **Ölçüler:** 30, 40, 50 cm veya özel ölçü.\n- **Malzeme:** 4 mm şeffaf, kontur kesim pleksi.\n- **Aydınlatma:** 12V esnek silikon neon LED.\n- **Kablo:** Yaklaşık 2 metre.\n- **Paket içeriği:** Neon dekor ve 12V adaptör.\n\n### ✨ Neden 3Dbade Neon?\n\n- Fotojenik ve dikkat çekici tasarım\n- İç mekan kullanımı için güvenli LED teknolojisi\n- Düşük enerji tüketimi\n- Özel ölçü seçeneği\n- Güvenli paketleme ve Türkiye geneli gönderim\n\n> **Hayal Et, Baskıla, Yaşa! ✨** ${title}, mekanına karakter katmak için hazır.`;
+}
+
 export const productImageDefaults: Record<
   string,
   { mainImage: string; hoverImages: string[] }
 > = {
-  "kopek-mc": { mainImage: "/api/urun-gorsel/pop-art/kopek-mc/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/kopek-mc/hover.jpg"] },
-  fenerbahce: { mainImage: "/api/urun-gorsel/takimlar/fenerbahce/ana.jpg", hoverImages: ["/api/urun-gorsel/takimlar/fenerbahce/hover.jpg"] },
-  "motorcu-kuru-kafa": { mainImage: "/api/urun-gorsel/pop-art/motorcu-kuru-kafa/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/motorcu-kuru-kafa/hover.jpg"] },
-  "eriyen-dondurma-neon": { mainImage: "/api/urun-gorsel/kafe-restoran/dondurma/ana.jpg", hoverImages: ["/api/urun-gorsel/kafe-restoran/dondurma/hover.jpg"] },
-  "hamburger-neon": { mainImage: "/api/urun-gorsel/kafe-restoran/hamburger/ana.jpg", hoverImages: ["/api/urun-gorsel/kafe-restoran/hamburger/hover.jpg"] },
-  trabzonspor: { mainImage: "/api/urun-gorsel/takimlar/trabzonspor/ana.jpg", hoverImages: ["/api/urun-gorsel/takimlar/trabzonspor/hover.jpg"] },
-  besiktas: { mainImage: "/api/urun-gorsel/takimlar/besiktas/ana.jpg", hoverImages: ["/api/urun-gorsel/takimlar/besiktas/hover.jpg"] },
-  galatasaray: { mainImage: "/api/urun-gorsel/takimlar/galatasaray/ana.jpg", hoverImages: ["/api/urun-gorsel/takimlar/galatasaray/hover.jpg"] },
-  "cilekli-astronot": { mainImage: "/api/urun-gorsel/astronot/cilekli/ana.jpg", hoverImages: ["/api/urun-gorsel/astronot/cilekli/hover.jpg"] },
-  "astronot-savasci": { mainImage: "/api/urun-gorsel/astronot/savasci/ana.jpg", hoverImages: ["/api/urun-gorsel/astronot/savasci/hover.jpg"] },
-  "astronot-ay": { mainImage: "/api/urun-gorsel/astronot/ay/ana.jpg", hoverImages: ["/api/urun-gorsel/astronot/ay/hover.jpg"] },
-  "kopek-patron": { mainImage: "/api/urun-gorsel/pop-art/kopek-patron/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/kopek-patron/hover.jpg"] },
-  "tropikal-kuru-kafa": { mainImage: "/api/urun-gorsel/pop-art/tropikal-kuru-kafa/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/tropikal-kuru-kafa/hover.jpg"] },
-  "comic-ouch": { mainImage: "/api/urun-gorsel/pop-art/ouch/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/ouch/hover.jpg"] },
-  "dolar-kesesi": { mainImage: "/api/urun-gorsel/pop-art/dolar-kesesi/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/dolar-kesesi/hover.jpg"] },
-  "gamer-el": { mainImage: "/api/urun-gorsel/gamer/gamer-el/ana.jpg", hoverImages: ["/api/urun-gorsel/gamer/gamer-el/hover.jpg"] },
-  "smac-astronot": { mainImage: "/api/urun-gorsel/astronot/smac/ana.jpg", hoverImages: ["/api/urun-gorsel/astronot/smac/hover.jpg"] },
-  "kopek-kafa": { mainImage: "/api/urun-gorsel/pop-art/kopek-kafa/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/kopek-kafa/hover.jpg"] },
-  "pizza-neon": { mainImage: "/api/urun-gorsel/kafe-restoran/pizza/ana.jpg", hoverImages: ["/api/urun-gorsel/kafe-restoran/pizza/hover.jpg"] },
-  "kuru-kafa-papatya": { mainImage: "/api/urun-gorsel/pop-art/kuru-kafa-papatya/ana.jpg", hoverImages: ["/api/urun-gorsel/pop-art/kuru-kafa-papatya/hover.jpg"] },
-  "gamer-oyun-kolu": { mainImage: "/api/urun-gorsel/gamer/oyun-kolu/ana.jpg", hoverImages: ["/api/urun-gorsel/gamer/oyun-kolu/hover.jpg"] },
-  "acik-neon": { mainImage: "/api/urun-gorsel/kafe-restoran/acik/ana.jpg", hoverImages: ["/api/urun-gorsel/kafe-restoran/acik/hover.jpg"] },
-  "kapali-neon": { mainImage: "/api/urun-gorsel/kafe-restoran/kapali/ana.jpg", hoverImages: ["/api/urun-gorsel/kafe-restoran/kapali/hover.jpg"] },
+  "kopek-mc": { mainImage: "/urun-gorselleri/pop-art/kopek-mc/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/kopek-mc/hover.jpg"] },
+  fenerbahce: { mainImage: "/urun-gorselleri/takimlar/fenerbahce/ana.png", hoverImages: ["/urun-gorselleri/takimlar/fenerbahce/hover.jpg"] },
+  "motorcu-kuru-kafa": { mainImage: "/urun-gorselleri/pop-art/motorcu-kuru-kafa/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/motorcu-kuru-kafa/hover.jpg"] },
+  "eriyen-dondurma-neon": { mainImage: "/urun-gorselleri/kafe-restoran/dondurma/ana.jpg", hoverImages: ["/urun-gorselleri/kafe-restoran/dondurma/hover.JPG"] },
+  "hamburger-neon": { mainImage: "/urun-gorselleri/kafe-restoran/hamburger/ana.jfif", hoverImages: ["/urun-gorselleri/kafe-restoran/hamburger/hover.jpg"] },
+  trabzonspor: { mainImage: "/urun-gorselleri/takimlar/trabzonspor/ana.jpg", hoverImages: ["/urun-gorselleri/takimlar/trabzonspor/hover.JPG"] },
+  besiktas: { mainImage: "/urun-gorselleri/takimlar/besiktas/ana.jpg", hoverImages: ["/urun-gorselleri/takimlar/besiktas/hover.jpg"] },
+  galatasaray: { mainImage: "/urun-gorselleri/takimlar/galatasaray/ana.jpg", hoverImages: ["/urun-gorselleri/takimlar/galatasaray/hover.jpg"] },
+  "cilekli-astronot": { mainImage: "/urun-gorselleri/astronot/cilekli/ana.jpg", hoverImages: ["/urun-gorselleri/astronot/cilekli/hover.jpg"] },
+  "astronot-savasci": { mainImage: "/urun-gorselleri/astronot/savasci/ana.jpg", hoverImages: ["/urun-gorselleri/astronot/savasci/hover.jpg"] },
+  "astronot-ay": { mainImage: "/urun-gorselleri/astronot/ay/ana.jpg", hoverImages: ["/urun-gorselleri/astronot/ay/hover.jpg"] },
+  "kopek-patron": { mainImage: "/urun-gorselleri/pop-art/kopek-patron/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/kopek-patron/hover.jpg"] },
+  "tropikal-kuru-kafa": { mainImage: "/urun-gorselleri/pop-art/tropikal-kuru-kafa/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/tropikal-kuru-kafa/hover.jpg"] },
+  "comic-ouch": { mainImage: "/urun-gorselleri/pop-art/ouch/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/ouch/hover.jpg"] },
+  "dolar-kesesi": { mainImage: "/urun-gorselleri/pop-art/dolar-kesesi/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/dolar-kesesi/hover.JPG"] },
+  "gamer-el": { mainImage: "/urun-gorselleri/gamer/gamer-el/ana.jpg", hoverImages: ["/urun-gorselleri/gamer/gamer-el/hover.jpg"] },
+  "smac-astronot": { mainImage: "/urun-gorselleri/astronot/smac/ana.jpg", hoverImages: ["/urun-gorselleri/astronot/smac/hover.jpg"] },
+  "kopek-kafa": { mainImage: "/urun-gorselleri/pop-art/kopek-kafa/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/kopek-kafa/hover.jpg"] },
+  "pizza-neon": { mainImage: "/urun-gorselleri/kafe-restoran/pizza/ana.jpg", hoverImages: ["/urun-gorselleri/kafe-restoran/pizza/hover.jpg"] },
+  "kuru-kafa-papatya": { mainImage: "/urun-gorselleri/pop-art/kuru-kafa-papatya/ana.jpg", hoverImages: ["/urun-gorselleri/pop-art/kuru-kafa-papatya/hover.jpg"] },
+  "gamer-oyun-kolu": { mainImage: "/urun-gorselleri/gamer/oyun-kolu/ana.jfif", hoverImages: ["/urun-gorselleri/gamer/oyun-kolu/hover.jpg"] },
+  "acik-neon": { mainImage: "/urun-gorselleri/kafe-restoran/acik/ana.jpg", hoverImages: ["/urun-gorselleri/kafe-restoran/acik/hover.jpg"] },
+  "kapali-neon": { mainImage: "/urun-gorselleri/kafe-restoran/kapali/ana.jpg", hoverImages: ["/urun-gorselleri/kafe-restoran/kapali/hover.jpg"] },
 };
 
 export const defaultProducts: AdminProduct[] = productNames.map(
@@ -126,7 +131,7 @@ export const defaultProducts: AdminProduct[] = productNames.map(
     price50: id === "eriyen-dondurma-neon" ? "4900" : "4100",
     specialPrice: "Teklif Al",
     remoteExtra: "250",
-    description: id === "kopek-patron" ? dogPatronDescription : "",
+    description: defaultDescription(title, category),
     technical: technicalTemplate,
     mainImage: productImageDefaults[id]?.mainImage || "",
     hoverImages: productImageDefaults[id]?.hoverImages || [],
