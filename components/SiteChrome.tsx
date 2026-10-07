@@ -6,11 +6,11 @@ import SiteFooter from "./SiteFooter";
 import SiteHeader from "./SiteHeader";
 
 export default function SiteChrome({ children }: { children: ReactNode }) {
-  const isHomePage = usePathname() === "/";
+  const pathname = usePathname();
+  const isStandalonePage = pathname === "/" || pathname === "/takip";
 
-  // Ana sayfada aynı üst ve alt alan zaten sayfanın kendi sepet işleviyle yer alıyor.
-  // Diğer tüm mevcut ve gelecekteki sayfalar bu ortak iskeleti otomatik kullanır.
-  if (isHomePage) return <>{children}</>;
+  // Ana sayfa kendi site iskeletini içerir; takip sayfası ise tek amaçlı bir bağlantı sayfasıdır.
+  if (isStandalonePage) return <>{children}</>;
 
   return (
     <>

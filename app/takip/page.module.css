@@ -1,0 +1,290 @@
+.page {
+  --surface: rgba(19, 17, 29, 0.88);
+  --line: rgba(255, 255, 255, 0.11);
+  --muted: #a8a2b4;
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: 28px 16px 36px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    radial-gradient(circle at 50% -10%, #28135e 0, transparent 42%),
+    linear-gradient(150deg, #09070f 0%, #100b19 54%, #08070e 100%);
+  background-size: 42px 42px, 42px 42px, auto, auto;
+  color: #fff;
+}
+
+.page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 100, 21, 0.035));
+  content: "";
+  pointer-events: none;
+}
+
+.glowOne,
+.glowTwo {
+  position: absolute;
+  z-index: -1;
+  width: 220px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  filter: blur(72px);
+  opacity: 0.26;
+  pointer-events: none;
+}
+
+.glowOne {
+  top: 15%;
+  left: -130px;
+  background: #0bbcff;
+}
+
+.glowTwo {
+  right: -140px;
+  bottom: 10%;
+  background: #ff5f15;
+}
+
+.card {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+}
+
+.logo {
+  width: min(72vw, 320px);
+  height: auto;
+  filter: drop-shadow(0 12px 34px rgba(0, 143, 255, 0.2));
+}
+
+.eyebrow {
+  margin: 8px 0 12px;
+  color: #ffb25b;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+}
+
+.card h1 {
+  max-width: 520px;
+  margin: 0 auto;
+  font-size: clamp(2rem, 9vw, 3.55rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.intro {
+  max-width: 440px;
+  margin: 17px auto 26px;
+  color: #c5c0cd;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+.links {
+  display: grid;
+  gap: 12px;
+}
+
+.link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) 30px;
+  gap: 14px;
+  align-items: center;
+  min-height: 76px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 11px 15px 11px 12px;
+  background: var(--surface);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.035);
+  text-align: left;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+  backdrop-filter: blur(16px);
+}
+
+.link::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+  content: "";
+}
+
+.link:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent), white 24%);
+  background: rgba(30, 27, 42, 0.94);
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.3),
+    0 0 24px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.link:focus-visible,
+.logoLink:focus-visible {
+  outline: 3px solid #6ee7ff;
+  outline-offset: 4px;
+}
+
+.iconWrap {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--icon-bg);
+  color: var(--icon-color, #fff);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.iconWrap svg {
+  width: 25px;
+  height: 25px;
+  fill: currentColor;
+}
+
+.websiteIcon {
+  width: 42px;
+  height: auto;
+  object-fit: contain;
+}
+
+.linkCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.linkCopy strong {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.linkCopy small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.73rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: #cbc6d2;
+  transition:
+    transform 180ms ease,
+    color 180ms ease;
+}
+
+.arrow svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.link:hover .arrow {
+  transform: translate(2px, -2px);
+  color: #fff;
+}
+
+.website {
+  --accent: #13c7ff;
+  --icon-bg: linear-gradient(145deg, #08192c, #18112a);
+}
+
+.instagram {
+  --accent: #ff3b92;
+  --icon-bg: linear-gradient(140deg, #5b2aff 0%, #dc2e91 52%, #ff9c32 100%);
+}
+
+.facebook {
+  --accent: #1877f2;
+  --icon-bg: #1877f2;
+}
+
+.tiktok {
+  --accent: #25f4ee;
+  --icon-bg: #050505;
+}
+
+.tiktok .iconWrap svg {
+  filter: drop-shadow(-1.5px 0 #25f4ee) drop-shadow(1.5px 0 #fe2c55);
+}
+
+.threads {
+  --accent: #f2f2f2;
+  --icon-bg: #f4f4f4;
+  --icon-color: #090909;
+}
+
+.pinterest {
+  --accent: #e60023;
+  --icon-bg: #e60023;
+}
+
+.footer {
+  margin: 27px auto 0;
+  color: #8f899a;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.footer span {
+  color: #ff943d;
+}
+
+@media (min-width: 680px) {
+  .page {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 46px 24px;
+  }
+
+  .logo {
+    width: 300px;
+  }
+
+  .link {
+    min-height: 80px;
+    padding-right: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .arrow {
+    transition: none;
+  }
+}
