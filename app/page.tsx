@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import SocialIconLinks from "../components/SocialIconLinks";
 
 // Yeni eklenecek tüm neon ürünleri de bu standart fiyatla tanımlanacak.
 const NEON_PRICE = "₺3.950";
@@ -1163,6 +1164,7 @@ export default function Home() {
             Şartlar &amp; Koşullar
           </Link>
         </div>
+        <SocialIconLinks />
         <p>© 2026 3dBade Neon</p>
       </footer>
       <a
