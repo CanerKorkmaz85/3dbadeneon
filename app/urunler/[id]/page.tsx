@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import FormattedProductCopy from "../../../components/FormattedProductCopy";
+
 import {
   createEmptyProduct,
   readAdminProducts,
@@ -400,6 +402,14 @@ export default function ManagedProductPage() {
           </dl>
         </div>
       </section>
+
+      {product.description && (
+        <section className="product-content-area product-full-description">
+          <div className="product-copy-preview">
+            <FormattedProductCopy content={product.description} />
+          </div>
+        </section>
+      )}
 
     </main>
   );
