@@ -126,44 +126,28 @@ export default function RootLayout({
         <SiteChrome>{children}</SiteChrome>
 
         <HomeLinkFixes />
-        return (
-  <html lang="tr">
-    <body className="min-h-full flex flex-col">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationSchema),
-        }}
-      />
 
-      <SiteChrome>{children}</SiteChrome>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function loadScript(a){
+                var b=document.getElementsByTagName("head")[0],
+                c=document.createElement("script");
+                c.type="text/javascript";
+                c.src="https://tracker.metricool.com/resources/be.js";
+                c.onreadystatechange=a;
+                c.onload=a;
+                b.appendChild(c)
+              }
 
-      <HomeLinkFixes />
-
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            function loadScript(a){
-              var b=document.getElementsByTagName("head")[0],
-              c=document.createElement("script");
-              c.type="text/javascript";
-              c.src="https://tracker.metricool.com/resources/be.js";
-              c.onreadystatechange=a;
-              c.onload=a;
-              b.appendChild(c)
-            }
-
-            loadScript(function(){
-              beTracker.t({
-                hash:"18f1189eb1e898fe812bba76d6d5a401"
-              })
-            });
-          `,
-        }}
-      />
-    </body>
-  </html>
-);
+              loadScript(function(){
+                beTracker.t({
+                  hash:"18f1189eb1e898fe812bba76d6d5a401"
+                })
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   );
