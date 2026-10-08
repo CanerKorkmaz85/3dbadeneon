@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import SocialIconLinks from "../components/SocialIconLinks";
 
 // Yeni eklenecek tüm neon ürünleri de bu standart fiyatla tanımlanacak.
 const NEON_PRICE = "₺3.950";
@@ -490,27 +491,31 @@ export default function Home() {
         <a href="#sss">Sık Sorulan Sorular</a>
         <Link href="/iletisim">İletişim</Link>
       </nav>
-      <section id="anasayfa" className="shop-hero team-hero">
-        <div className="team-video" aria-label="Takım neonları kısa gösterimi">
-          {teamVideoScenes.map((scene, index) => (
-            <Image
-              key={scene.src}
-              className="team-video-scene"
-              style={{ "--scene": index } as React.CSSProperties}
-              src={scene.src}
-              alt={scene.alt}
-              width={1408}
-              height={992}
-              priority={index < 2}
-            />
-          ))}
-          <div className="team-video-shade" />
-        </div>
-        <div className="team-hero-caption">
-          <p>Takımının ruhunu, mekanına özel neon tasarımla yansıt.</p>
-          <span>Takımını ışığa dönüştür</span>
-        </div>
-      </section>
+<section id="anasayfa" className="shop-hero team-hero">
+  <div className="team-video" aria-label="Takım neonları kısa gösterimi">
+    {teamVideoScenes.map((scene, index) => (
+      <Image
+        key={scene.src}
+        className="team-video-scene"
+        style={{ "--scene": index } as React.CSSProperties}
+        src={scene.src}
+        alt={scene.alt}
+        width={1408}
+        height={992}
+        priority={index < 2}
+      />
+    ))}
+
+    <div className="team-video-shade" />
+  </div>
+
+  <div className="team-hero-caption">
+    <h1 style={{ margin: 0, font: "inherit" }}>
+  Takımının ruhunu, mekanına özel neon tasarımla yansıt.
+</h1>
+    <span>Takımını ışığa dönüştür</span>
+  </div>
+</section>
       <section id="urunler" className="shop-section featured-section">
         <div className="shop-title-row">
           <div>
@@ -1163,6 +1168,7 @@ export default function Home() {
             Şartlar &amp; Koşullar
           </Link>
         </div>
+        <SocialIconLinks />
         <p>© 2026 3dBade Neon</p>
       </footer>
       <a

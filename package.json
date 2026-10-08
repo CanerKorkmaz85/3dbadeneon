@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "next dev --port 3000",
     "editor": "node scripts/local-editor.mjs",
     "dev:next": "next dev",
     "build": "next build",

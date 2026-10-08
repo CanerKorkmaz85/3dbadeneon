@@ -2388,6 +2388,8 @@ a {
   object-fit: contain;
 }
 .shop-product-image .discount-badge,
+.all-product-image .discount-badge,
+.product-image .discount-badge,
 .team-video::after,
 .collection-visual::after,
 .venue-card::after,
@@ -3491,6 +3493,10 @@ a {
   margin: 0;
   padding: 10px 16px;
 }
+.price-save-error {
+  color: #b42318;
+  font-size: 12px;
+}
 @media (max-width: 620px) {
   .compact-price-page .price-admin-content {
     padding-top: 32px;
@@ -3871,6 +3877,68 @@ a {
 .footer-policy-links {
   min-width: 210px;
 }
+.store-footer .footer-socials {
+  min-width: 225px;
+  gap: 12px;
+}
+.store-footer .footer-social-icons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.store-footer .footer-social-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 7px 18px #0008;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+.store-footer .footer-social-icon:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 23px #000b;
+}
+.store-footer .footer-social-icon:focus-visible,
+.store-footer .footer-all-links:focus-visible {
+  outline: 3px solid #6ee7ff;
+  outline-offset: 3px;
+}
+.footer-social-icon svg {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+}
+.footer-social-instagram {
+  background: linear-gradient(140deg, #5b2aff, #dc2e91 52%, #ff9c32);
+}
+.footer-social-facebook {
+  background: #1877f2;
+}
+.footer-social-tiktok {
+  background: #050505;
+}
+.footer-social-tiktok svg {
+  filter: drop-shadow(-1.2px 0 #25f4ee) drop-shadow(1.2px 0 #fe2c55);
+}
+.footer-social-threads {
+  background: #f4f4f4;
+  color: #090909 !important;
+}
+.footer-social-pinterest {
+  background: #e60023;
+}
+.store-footer .footer-all-links {
+  width: max-content;
+  color: var(--lime);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
 @media (max-width: 780px) {
   .ticker {
     font-size: 10px;
@@ -3899,6 +3967,14 @@ a {
   }
   .footer-policy-links {
     min-width: 0;
+  }
+  .store-footer .footer-socials {
+    min-width: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .store-footer .footer-social-icon {
+    transition: none;
   }
 }
 .policy-page {
@@ -4259,6 +4335,7 @@ a {
   object-fit: cover;
 }
 .product-image {
+  position: relative;
   min-height: 550px;
   background: #f4f0ec;
   display: grid;

@@ -161,3 +161,17 @@ const server = http.createServer(async (req, res) => {
 server.listen(port, "127.0.0.1", () => {
   console.log(`3Dbade yerel editor servisi: http://127.0.0.1:${port}`);
 });
+
+server.on("error", (error) => {
+  if (error?.code === "EADDRINUSE") {
+    console.error(
+      `\nHATA: ${port} numarali port baska bir program tarafindan kullaniliyor.\n` +
+        "Acik eski bir 3Dbade Editor penceresi varsa kapatip yeniden deneyin.\n",
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  console.error("\nYerel editor servisi baslatilamadi:", error);
+  process.exitCode = 1;
+});

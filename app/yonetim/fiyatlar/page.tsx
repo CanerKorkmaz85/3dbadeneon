@@ -17,8 +17,11 @@ type PriceRow = {
   remoteExtra: number;
   special: string;
 };
-function readRows(): PriceRow[] {
-  return readAdminProducts().map((product) => ({
+
+const editorUrl = "http://127.0.0.1:3002";
+
+function productsToRows(products: AdminProduct[]): PriceRow[] {
+  return products.map((product) => ({
     id: product.id,
     product: product.title,
     cm30: Number(product.price30) || 0,
@@ -29,11 +32,34 @@ function readRows(): PriceRow[] {
   }));
 }
 
+function readRows(): PriceRow[] {
+  return productsToRows(readAdminProducts());
+}
+
 export default function PriceManagementPage() {
   const [rows, setRows] = useState<PriceRow[]>(readRows);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   useEffect(() => {
     const refresh = () => setRows(readRows());
+
+    async function loadFromComputer() {
+      try {
+        const response = await fetch(`${editorUrl}/products?t=${Date.now()}`, {
+          cache: "no-store",
+        });
+        const result = await response.json();
+        if (response.ok && Array.isArray(result.products) && result.products.length) {
+          writeAdminProducts(result.products);
+          setRows(productsToRows(result.products));
+        }
+      } catch {
+        setError("Bilgisayardaki fiyat dosyası okunamadı. 3Dbade Editor penceresinin açık olduğunu kontrol edin.");
+      }
+    }
+
+    loadFromComputer();
     window.addEventListener("storage", refresh);
     window.addEventListener("3dbade-products-updated", refresh);
     return () => {
@@ -49,7 +75,8 @@ export default function PriceManagementPage() {
     setRows((current) =>
       current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
-  function savePrices() {
+  async function savePrices() {
+    if (saving) return;
     const byId = new Map(rows.map((row) => [row.id, row]));
     const next: AdminProduct[] = readAdminProducts().map((product) => {
       const row = byId.get(product.id);
@@ -64,9 +91,28 @@ export default function PriceManagementPage() {
         specialPrice: row.special,
       };
     });
-    writeAdminProducts(next);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2200);
+
+    setSaving(true);
+    setSaved(false);
+    setError("");
+    try {
+      const response = await fetch(`${editorUrl}/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products: next }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Fiyatlar kaydedilemedi.");
+      const savedProducts = result.products as AdminProduct[];
+      writeAdminProducts(savedProducts);
+      setRows(productsToRows(savedProducts));
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 3000);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Fiyatlar kaydedilemedi.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -163,14 +209,15 @@ export default function PriceManagementPage() {
           </table>
         </div>
         <div className="compact-price-footer">
-          <button className="price-save" onClick={savePrices}>
-            KAYDET
+          <button className="price-save" onClick={savePrices} disabled={saving}>
+            {saving ? "KAYDEDİLİYOR..." : "KAYDET"}
           </button>
           {saved && (
             <strong className="price-saved">
-              Kaydedildi. Ürün yönetiminde de güncel fiyatlar görünür.
+              Bilgisayara kaydedildi. Fiyatlar artık kapanınca kaybolmaz.
             </strong>
           )}
+          {error && <strong className="price-save-error">{error}</strong>}
           <small>
             Fiyatlar TL olarak girilir. Kumanda sütunundaki rakam, seçildiğinde
             ölçü fiyatına eklenir.

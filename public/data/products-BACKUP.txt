@@ -1,0 +1,207 @@
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import fs from "fs";
+import path from "path";
+
+const SITE_URL = "https://3dbadeneon.com";
+
+type Product = {
+  id: string;
+  title: string;
+  category?: string;
+  price30?: string;
+  price40?: string;
+  price50?: string;
+  specialPrice?: string;
+  remoteExtra?: string;
+  description?: string;
+  technical?: string;
+  mainImage?: string;
+  hoverImages?: string[];
+};
+
+function cleanHtml(html?: string) {
+  if (!html) return "";
+
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function absoluteUrl(url?: string) {
+  if (!url) return undefined;
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  return `${SITE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+}
+
+async function getProduct(id: string): Promise<Product | null> {
+  try {
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "data",
+      "products.json"
+    );
+
+    const file = fs.readFileSync(filePath, "utf8");
+    const products = JSON.parse(file) as Product[];
+
+    return products.find((item) => item.id === id) || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    return {
+      title: "Neon ve 3D Tasarım Ürünü",
+      description:
+        "3dBade Neon neon tabela, LED neon, 3D baskı ve özel tasarım ürünleri.",
+      robots: {
+        index: false,
+        follow: true,
+      },
+    };
+  }
+
+  const description =
+    cleanHtml(product.description).slice(0, 155) ||
+    `${product.title}. Neon LED, özel tasarım ve dekoratif ürün seçeneklerini 3dBade Neon'da inceleyin.`;
+
+  const productUrl = `${SITE_URL}/urunler/${product.id}`;
+  const imageUrl = absoluteUrl(product.mainImage);
+
+  return {
+    title: `${product.title} | Neon LED ve Özel Tasarım`,
+
+    description,
+
+    alternates: {
+      canonical: productUrl,
+    },
+
+    openGraph: {
+      type: "website",
+      url: productUrl,
+      title: `${product.title} | 3dBade Neon`,
+      description,
+      images: imageUrl
+        ? [
+            {
+              url: imageUrl,
+              alt: product.title,
+            },
+          ]
+        : undefined,
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.title} | 3dBade Neon`,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export default async function ProductLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const product = await getProduct(id);
+
+  if (!product) {
+    return children;
+  }
+
+  const productUrl = `${SITE_URL}/urunler/${product.id}`;
+  const imageUrl = absoluteUrl(product.mainImage);
+  const description = cleanHtml(product.description);
+
+  const price = Number(product.price30 || 0);
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+
+    name: product.title,
+
+    description:
+      description ||
+      `${product.title} özel tasarım neon LED dekoratif ürün.`,
+
+    sku: product.id,
+
+    category: product.category || "Neon LED",
+
+    brand: {
+      "@type": "Brand",
+      name: "3dBade Neon",
+    },
+
+    url: productUrl,
+
+    ...(imageUrl
+      ? {
+          image: [
+            imageUrl,
+            ...(product.hoverImages || [])
+              .map(absoluteUrl)
+              .filter(Boolean),
+          ],
+        }
+      : {}),
+
+    ...(price > 0
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: productUrl,
+            priceCurrency: "TRY",
+            price: price.toString(),
+            seller: {
+              "@type": "Organization",
+              name: "3dBade Neon",
+            },
+          },
+        }
+      : {}),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productSchema),
+        }}
+      />
+
+      {children}
+    </>
+  );
+}

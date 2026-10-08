@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { originalPriceForDiscount } from "../../../lib/pricing";
 import FormattedProductCopy from "../../../components/FormattedProductCopy";
 
 type ProductPreview = {
@@ -67,6 +68,9 @@ export default function ProductPreviewPage() {
       : (basePrice +
           (remote === "Kumandalı" ? Number(product.remoteExtra || 0) : 0)) *
         quantity;
+  const originalShownPrice = shownPrice
+    ? originalPriceForDiscount(shownPrice)
+    : null;
 
   const technicalSpecs = (product.technical || "")
     .split("\n\n")
@@ -95,6 +99,7 @@ export default function ProductPreviewPage() {
           </div>
           <div className="product-image">
             {images[imageIndex] ? <img src={images[imageIndex]} alt={product.title} /> : <span>Görsel seçilmedi</span>}
+            <em className="discount-badge">-%20</em>
           </div>
         </div>
 
@@ -103,6 +108,7 @@ export default function ProductPreviewPage() {
           <h1>{product.title}</h1>
           <div className="product-stars"><span>★★★★★</span><small>Yeni ürün · 3Dbade özel seri</small></div>
           <div className="product-price">
+            {originalShownPrice ? <del>₺{originalShownPrice.toLocaleString("tr-TR")}</del> : null}
             <strong>{shownPrice ? `₺${shownPrice.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong>
             <small>{size === "Özel" ? "Özel ölçü için sana özel teklif hazırlanır" : "KDV dahil · Ücretsiz kargo"}</small>
           </div>
