@@ -385,7 +385,6 @@
     "id": "wc-neon-led-1791145342082"
   },
   {
-    "id": "kasa-neon-1791458927660",
     "title": "Kasa Neon",
     "category": "Kafe & Restoranlar",
     "price30": "3350",
@@ -393,11 +392,12 @@
     "price50": "4350",
     "specialPrice": "Teklif Al",
     "remoteExtra": "250",
-    "description": "",
+    "description": "<h1>Kasa Neon</h1><p><strong>Mekanına güçlü, modern ve dikkat çekici bir ışık dokunuşu kat.</strong></p><p><strong>Kasa Neon</strong>, 3Dbade Neon özel serisinde kafe &amp; restoranlar için tasarlanmış dekoratif bir neon LED üründür. Canlı ışık etkisiyle duvar, vitrin, çalışma alanı veya konsept köşelerde güçlü bir odak noktası oluşturur.</p><p>Yeni nesil esnek silikon neon LED teknolojisi sayesinde klasik cam neona göre daha dayanıklı, düşük enerji tüketimli ve güvenli kullanım sunar. Şeffaf pleksi taşıyıcı ile temiz ve modern bir görünüm elde edilir.</p><h3>🛠️ Teknik Özellikler</h3><ul><li><strong>Ölçüler:</strong> 30, 40, 50 cm veya özel ölçü.</li><li><strong>Malzeme:</strong> 4 mm şeffaf, kontur kesim pleksi.</li><li><strong>Aydınlatma:</strong> 12V esnek silikon neon LED.</li><li><strong>Kablo:</strong> Yaklaşık 2 metre.</li><li><strong>Paket içeriği:</strong> Neon dekor ve 12V adaptör.</li></ul><h3>✨ Neden 3Dbade Neon?</h3><ul><li>Fotojenik ve dikkat çekici tasarım</li><li>İç mekan kullanımı için güvenli LED teknolojisi</li><li>Düşük enerji tüketimi</li><li>Özel ölçü seçeneği</li><li>Güvenli paketleme ve Türkiye geneli gönderim</li></ul><blockquote><strong>Hayal Et, Baskıla, Yaşa! ✨</strong> Kasa Neon, mekanına karakter katmak için hazır.</blockquote><!--EndFragment-->",
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/uploads/kasa-neon-1791458927660/ana-1791458927680-8yzf2a.jpg",
     "hoverImages": [
       "/uploads/kasa-neon-1791458927660/galeri-1-1791458927683-esvva2.jpg"
-    ]
+    ],
+    "id": "kasa-neon-1791458927660"
   }
 ]
