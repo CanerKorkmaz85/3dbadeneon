@@ -181,7 +181,6 @@
     "id": "astronot-savasci"
   },
   {
-    "id": "astronot-ay",
     "title": "Astronot Ay Neon LED",
     "category": "Ev Dekorasyon",
     "price30": "4350",
@@ -193,8 +192,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/astronot/ay/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/astronot/ay/hover.jpg"
-    ]
+      "/urun-gorselleri/astronot/ay/hover.jpg",
+      "/uploads/astronot-ay/galeri-2-1791535368914-qnvjvd.jpg",
+      "/uploads/astronot-ay/galeri-3-1791535368919-gjsjbh.jpg"
+    ],
+    "id": "astronot-ay"
   },
   {
     "id": "kopek-patron",
