@@ -253,7 +253,6 @@
     "id": "comic-ouch"
   },
   {
-    "id": "dolar-kesesi",
     "title": "Dolar Kesesi Neon LED",
     "category": "Mağaza & Ofis",
     "price30": "3850",
@@ -265,8 +264,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/pop-art/dolar-kesesi/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/pop-art/dolar-kesesi/hover.JPG"
-    ]
+      "/urun-gorselleri/pop-art/dolar-kesesi/hover.JPG",
+      "/uploads/dolar-kesesi/galeri-2-1791535519546-0b5x9z.jpg",
+      "/uploads/dolar-kesesi/galeri-3-1791535519550-id51rb.jpg"
+    ],
+    "id": "dolar-kesesi"
   },
   {
     "id": "gamer-el",
