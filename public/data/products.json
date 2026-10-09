@@ -325,7 +325,6 @@
     "id": "kopek-kafa"
   },
   {
-    "id": "pizza-neon",
     "title": "Pizza Neon LED Tabela",
     "category": "Kafe & Restoranlar",
     "price30": "3850",
@@ -333,12 +332,15 @@
     "price50": "4650",
     "specialPrice": "Teklif Al",
     "remoteExtra": "250",
-    "description": "# Pizza Neon LED Tabela\n\n**Mekanına güçlü, modern ve dikkat çekici bir ışık dokunuşu kat.**\n\n**Pizza Neon LED Tabela**, 3Dbade Neon özel serisinde kafe & restoranlar için tasarlanmış dekoratif bir neon LED üründür. Canlı ışık etkisiyle duvar, vitrin, çalışma alanı veya konsept köşelerde güçlü bir odak noktası oluşturur.\n\nYeni nesil esnek silikon neon LED teknolojisi sayesinde klasik cam neona göre daha dayanıklı, düşük enerji tüketimli ve güvenli kullanım sunar. Şeffaf pleksi taşıyıcı ile temiz ve modern bir görünüm elde edilir.\n\n### 🛠️ Teknik Özellikler\n\n- **Ölçüler:** 30, 40, 50 cm veya özel ölçü.\n- **Malzeme:** 4 mm şeffaf, kontur kesim pleksi.\n- **Aydınlatma:** 12V esnek silikon neon LED.\n- **Kablo:** Yaklaşık 2 metre.\n- **Paket içeriği:** Neon dekor ve 12V adaptör.\n\n### ✨ Neden 3Dbade Neon?\n\n- Fotojenik ve dikkat çekici tasarım\n- İç mekan kullanımı için güvenli LED teknolojisi\n- Düşük enerji tüketimi\n- Özel ölçü seçeneği\n- Güvenli paketleme ve Türkiye geneli gönderim\n\n> **Hayal Et, Baskıla, Yaşa! ✨** Pizza Neon LED Tabela, mekanına karakter katmak için hazır.",
+    "description": "<h1>Pizza Neon LED Tabela</h1><p><strong>Mekanına güçlü, modern ve dikkat çekici bir ışık dokunuşu kat.</strong></p><p><strong>Pizza Neon LED Tabela</strong>, 3Dbade Neon özel serisinde kafe &amp; restoranlar için tasarlanmış dekoratif bir neon LED üründür. Canlı ışık etkisiyle duvar, vitrin, çalışma alanı veya konsept köşelerde güçlü bir odak noktası oluşturur.</p><p>Yeni nesil esnek silikon neon LED teknolojisi sayesinde klasik cam neona göre daha dayanıklı, düşük enerji tüketimli ve güvenli kullanım sunar. Şeffaf pleksi taşıyıcı ile temiz ve modern bir görünüm elde edilir.</p><h3>🛠️ Teknik Özellikler</h3><ul><li><strong>Ölçüler:</strong> 30, 40, 50 cm veya özel ölçü.</li><li><strong>Malzeme:</strong> 4 mm şeffaf, kontur kesim pleksi.</li><li><strong>Aydınlatma:</strong> 12V esnek silikon neon LED.</li><li><strong>Kablo:</strong> Yaklaşık 2 metre.</li><li><strong>Paket içeriği:</strong> Neon dekor ve 12V adaptör.</li></ul><h3>✨ Neden 3Dbade Neon?</h3><ul><li>Fotojenik ve dikkat çekici tasarım</li><li>İç mekan kullanımı için güvenli LED teknolojisi</li><li>Düşük enerji tüketimi</li><li>Özel ölçü seçeneği</li><li>Güvenli paketleme ve Türkiye geneli gönderim</li></ul><blockquote><strong>Hayal Et, Baskıla, Yaşa! ✨</strong> Pizza Neon LED Tabela, mekanına karakter katmak için hazır.</blockquote>",
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/kafe-restoran/pizza/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/kafe-restoran/pizza/hover.jpg"
-    ]
+      "/urun-gorselleri/kafe-restoran/pizza/hover.jpg",
+      "/uploads/pizza-neon/galeri-2-1791535662185-nsd0t4.jpg",
+      "/uploads/pizza-neon/galeri-3-1791535662191-3ti54h.jpg"
+    ],
+    "id": "pizza-neon"
   },
   {
     "id": "kuru-kafa-papatya",
