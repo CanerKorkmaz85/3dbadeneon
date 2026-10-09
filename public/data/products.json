@@ -145,7 +145,6 @@
     "id": "galatasaray"
   },
   {
-    "id": "cilekli-astronot",
     "title": "Çilekli Astronot Neon LED",
     "category": "Ev Dekorasyon",
     "price30": "4350",
@@ -157,8 +156,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/astronot/cilekli/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/astronot/cilekli/hover.jpg"
-    ]
+      "/urun-gorselleri/astronot/cilekli/hover.jpg",
+      "/uploads/cilekli-astronot/galeri-2-1791535318995-j6benv.jpg",
+      "/uploads/cilekli-astronot/galeri-3-1791535318996-cq57iq.jpg"
+    ],
+    "id": "cilekli-astronot"
   },
   {
     "id": "astronot-savasci",
