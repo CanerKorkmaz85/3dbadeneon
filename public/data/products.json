@@ -109,7 +109,6 @@
     "id": "trabzonspor"
   },
   {
-    "id": "besiktas",
     "title": "Beşiktaş Özel Seri Neon Logo",
     "category": "Takımlar",
     "price30": "4050",
@@ -121,8 +120,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/takimlar/besiktas/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/takimlar/besiktas/hover.jpg"
-    ]
+      "/urun-gorselleri/takimlar/besiktas/hover.jpg",
+      "/uploads/besiktas/galeri-2-1791535264534-yu9t6r.jpg",
+      "/uploads/besiktas/galeri-3-1791535264536-rwjsgr.jpg"
+    ],
+    "id": "besiktas"
   },
   {
     "id": "galatasaray",
