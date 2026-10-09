@@ -217,7 +217,6 @@
     "id": "kopek-patron"
   },
   {
-    "id": "tropikal-kuru-kafa",
     "title": "Tropikal Kuru Kafa Neon LED",
     "category": "Pop-Art",
     "price30": "4850",
@@ -229,8 +228,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/pop-art/tropikal-kuru-kafa/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/pop-art/tropikal-kuru-kafa/hover.jpg"
-    ]
+      "/urun-gorselleri/pop-art/tropikal-kuru-kafa/hover.jpg",
+      "/uploads/tropikal-kuru-kafa/galeri-2-1791535436591-flfzt0.jpg",
+      "/uploads/tropikal-kuru-kafa/galeri-3-1791535436595-c19otv.jpg"
+    ],
+    "id": "tropikal-kuru-kafa"
   },
   {
     "id": "comic-ouch",
