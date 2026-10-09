@@ -72,7 +72,6 @@
     "id": "eriyen-dondurma-neon"
   },
   {
-    "id": "hamburger-neon",
     "title": "Hamburger Neon",
     "category": "Kafe & Restoranlar",
     "price30": "4550",
@@ -84,8 +83,12 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/kafe-restoran/hamburger/ana.jfif",
     "hoverImages": [
-      "/urun-gorselleri/kafe-restoran/hamburger/hover.jpg"
-    ]
+      "/urun-gorselleri/kafe-restoran/hamburger/hover.jpg",
+      "/uploads/hamburger-neon/galeri-2-1791535210149-31qels.jpg",
+      "/uploads/hamburger-neon/galeri-3-1791535210150-ec2p3u.jpg",
+      "/uploads/hamburger-neon/galeri-4-1791535210152-y8mpo9.jpg"
+    ],
+    "id": "hamburger-neon"
   },
   {
     "id": "trabzonspor",
