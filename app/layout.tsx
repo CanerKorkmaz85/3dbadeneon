@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 import SiteChrome from "../components/SiteChrome";
@@ -127,7 +128,9 @@ export default function RootLayout({
 
         <HomeLinkFixes />
 
-        <script
+        <Script
+          id="metricool-tracker"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               function loadScript(a){

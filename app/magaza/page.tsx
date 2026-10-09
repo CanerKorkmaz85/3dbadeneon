@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { readAdminProducts, type AdminProduct } from "../../lib/admin-products";
+import { defaultProducts, readAdminProducts, type AdminProduct } from "../../lib/admin-products";
 import { originalPriceForDiscount } from "../../lib/pricing";
 
 const categories = [
@@ -46,11 +46,15 @@ async function loadProducts(): Promise<AdminProduct[]> {
 export default function MagazaPage() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [, setCartCount] = useState(0);
-  const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
+  const [products, setProducts] = useState<AdminProduct[]>(defaultProducts);
 
   useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("kategori");
-    if (requested && categories.includes(requested)) setSelectedCategory(requested);
+    const categoryTimer = window.setTimeout(() => {
+      const requested = new URLSearchParams(window.location.search).get("kategori");
+      if (requested && categories.includes(requested)) setSelectedCategory(requested);
+    }, 0);
+
+    return () => window.clearTimeout(categoryTimer);
   }, []);
 
   useEffect(() => {

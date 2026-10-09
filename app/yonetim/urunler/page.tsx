@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { productCopyHtml, sanitizeProductHtml } from "../../../components/FormattedProductCopy";
 import {
+  defaultProducts,
   productId,
   readAdminProducts,
   type AdminProduct,
@@ -58,7 +59,7 @@ const emptyDraft: Draft = {
 };
 
 export default function ProductEntryPage() {
-  const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
+  const [products, setProducts] = useState<AdminProduct[]>(defaultProducts);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -83,6 +84,9 @@ export default function ProductEntryPage() {
 
   useEffect(() => {
     let cancelled = false;
+    const cachedProductsTimer = window.setTimeout(() => {
+      if (!cancelled) setProducts(readAdminProducts());
+    }, 0);
 
     async function load() {
       try {
@@ -111,7 +115,10 @@ export default function ProductEntryPage() {
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      window.clearTimeout(cachedProductsTimer);
+    };
   }, []);
 
   function buildProduct() {

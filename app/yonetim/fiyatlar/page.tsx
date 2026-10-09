@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  defaultProducts,
   readAdminProducts,
   type AdminProduct,
   writeAdminProducts,
@@ -37,12 +38,13 @@ function readRows(): PriceRow[] {
 }
 
 export default function PriceManagementPage() {
-  const [rows, setRows] = useState<PriceRow[]>(readRows);
+  const [rows, setRows] = useState<PriceRow[]>(() => productsToRows(defaultProducts));
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     const refresh = () => setRows(readRows());
+    const cachedRowsTimer = window.setTimeout(refresh, 0);
 
     async function loadFromComputer() {
       try {
@@ -63,6 +65,7 @@ export default function PriceManagementPage() {
     window.addEventListener("storage", refresh);
     window.addEventListener("3dbade-products-updated", refresh);
     return () => {
+      window.clearTimeout(cachedRowsTimer);
       window.removeEventListener("storage", refresh);
       window.removeEventListener("3dbade-products-updated", refresh);
     };
