@@ -18,7 +18,6 @@
     "id": "kopek-mc"
   },
   {
-    "id": "fenerbahce",
     "title": "Fenerbahçe Özel Seri Neon Logo",
     "category": "Takımlar",
     "price30": "4050",
@@ -30,8 +29,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/takimlar/fenerbahce/ana.png",
     "hoverImages": [
-      "/urun-gorselleri/takimlar/fenerbahce/hover.jpg"
-    ]
+      "/urun-gorselleri/takimlar/fenerbahce/hover.jpg",
+      "/uploads/fenerbahce/galeri-2-1791535140198-4cq61r.jpg",
+      "/uploads/fenerbahce/galeri-3-1791535140200-855bgl.jpg"
+    ],
+    "id": "fenerbahce"
   },
   {
     "id": "motorcu-kuru-kafa",
