@@ -235,7 +235,6 @@
     "id": "tropikal-kuru-kafa"
   },
   {
-    "id": "comic-ouch",
     "title": "Comic Ouch! Pop-Art Neon",
     "category": "Pop-Art",
     "price30": "3850",
@@ -247,8 +246,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/pop-art/ouch/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/pop-art/ouch/hover.jpg"
-    ]
+      "/urun-gorselleri/pop-art/ouch/hover.jpg",
+      "/uploads/comic-ouch/galeri-2-1791535489608-ja3txn.jpg",
+      "/uploads/comic-ouch/galeri-3-1791535489613-958irz.jpg"
+    ],
+    "id": "comic-ouch"
   },
   {
     "id": "dolar-kesesi",
