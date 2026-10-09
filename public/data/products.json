@@ -271,7 +271,6 @@
     "id": "dolar-kesesi"
   },
   {
-    "id": "gamer-el",
     "title": "Gamer El & Oyun Kolu Neon",
     "category": "Ev Dekorasyon",
     "price30": "4550",
@@ -283,8 +282,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/gamer/gamer-el/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/gamer/gamer-el/hover.jpg"
-    ]
+      "/urun-gorselleri/gamer/gamer-el/hover.jpg",
+      "/uploads/gamer-el/galeri-2-1791535555930-ng0bjh.jpg",
+      "/uploads/gamer-el/galeri-3-1791535555935-l98l3z.jpg"
+    ],
+    "id": "gamer-el"
   },
   {
     "id": "smac-astronot",
