@@ -163,7 +163,6 @@
     "id": "cilekli-astronot"
   },
   {
-    "id": "astronot-savasci",
     "title": "Astronot Savaşçı Neon LED",
     "category": "Ev Dekorasyon",
     "price30": "4550",
@@ -175,8 +174,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/astronot/savasci/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/astronot/savasci/hover.jpg"
-    ]
+      "/urun-gorselleri/astronot/savasci/hover.jpg",
+      "/uploads/astronot-savasci/galeri-2-1791535347533-o4eh29.jpg",
+      "/uploads/astronot-savasci/galeri-3-1791535347537-vm0tak.jpg"
+    ],
+    "id": "astronot-savasci"
   },
   {
     "id": "astronot-ay",
