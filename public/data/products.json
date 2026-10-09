@@ -54,7 +54,6 @@
     "id": "motorcu-kuru-kafa"
   },
   {
-    "id": "eriyen-dondurma-neon",
     "title": "Eriyen Dondurma Neon Tabela",
     "category": "Kafe & Restoranlar",
     "price30": "3400",
@@ -66,8 +65,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/kafe-restoran/dondurma/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/kafe-restoran/dondurma/hover.JPG"
-    ]
+      "/urun-gorselleri/kafe-restoran/dondurma/hover.JPG",
+      "/uploads/eriyen-dondurma-neon/galeri-2-1791535185652-umxouk.jpg",
+      "/uploads/eriyen-dondurma-neon/galeri-3-1791535185654-sc5lio.jpg"
+    ],
+    "id": "eriyen-dondurma-neon"
   },
   {
     "id": "hamburger-neon",
