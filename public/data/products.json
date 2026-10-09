@@ -1,6 +1,5 @@
 [
   {
-    "id": "kopek-mc",
     "title": "Köpek Mc Neon",
     "category": "Pop-Art",
     "price30": "4100",
@@ -12,8 +11,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör (Priz Uyumlu)",
     "mainImage": "/urun-gorselleri/pop-art/kopek-mc/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/pop-art/kopek-mc/hover.jpg"
-    ]
+      "/urun-gorselleri/pop-art/kopek-mc/hover.jpg",
+      "/uploads/kopek-mc/galeri-2-1791535112357-86e9ig.jpg",
+      "/uploads/kopek-mc/galeri-3-1791535112362-xfxh8a.jpg"
+    ],
+    "id": "kopek-mc"
   },
   {
     "id": "fenerbahce",
