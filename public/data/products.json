@@ -127,7 +127,6 @@
     "id": "besiktas"
   },
   {
-    "id": "galatasaray",
     "title": "Galatasaray Özel Seri Neon Logo",
     "category": "Takımlar",
     "price30": "4050",
@@ -139,8 +138,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/takimlar/galatasaray/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/takimlar/galatasaray/hover.jpg"
-    ]
+      "/urun-gorselleri/takimlar/galatasaray/hover.jpg",
+      "/uploads/galatasaray/galeri-2-1791535292444-hh63qh.jpg",
+      "/uploads/galatasaray/galeri-3-1791535292446-znnhlu.jpg"
+    ],
+    "id": "galatasaray"
   },
   {
     "id": "cilekli-astronot",
