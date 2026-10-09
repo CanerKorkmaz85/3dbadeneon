@@ -36,7 +36,6 @@
     "id": "fenerbahce"
   },
   {
-    "id": "motorcu-kuru-kafa",
     "title": "Motorcu Kuru Kafa Neon LED",
     "category": "Pop-Art",
     "price30": "4350",
@@ -48,8 +47,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/pop-art/motorcu-kuru-kafa/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/pop-art/motorcu-kuru-kafa/hover.jpg"
-    ]
+      "/urun-gorselleri/pop-art/motorcu-kuru-kafa/hover.jpg",
+      "/uploads/motorcu-kuru-kafa/galeri-2-1791535163657-5c23jf.jpg",
+      "/uploads/motorcu-kuru-kafa/galeri-3-1791535163659-pcff95.jpg"
+    ],
+    "id": "motorcu-kuru-kafa"
   },
   {
     "id": "eriyen-dondurma-neon",
