@@ -289,7 +289,6 @@
     "id": "gamer-el"
   },
   {
-    "id": "smac-astronot",
     "title": "Smaç Basan Astronot Neon LED",
     "category": "Spor Salonu",
     "price30": "4050",
@@ -301,8 +300,11 @@
     "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
     "mainImage": "/urun-gorselleri/astronot/smac/ana.jpg",
     "hoverImages": [
-      "/urun-gorselleri/astronot/smac/hover.jpg"
-    ]
+      "/urun-gorselleri/astronot/smac/hover.jpg",
+      "/uploads/smac-astronot/galeri-2-1791535591475-kfwz19.jpg",
+      "/uploads/smac-astronot/galeri-3-1791535591479-6eig6i.jpg"
+    ],
+    "id": "smac-astronot"
   },
   {
     "id": "kopek-kafa",
