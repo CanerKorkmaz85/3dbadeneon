@@ -14,7 +14,7 @@ await fs.mkdir(dataDir, { recursive: true });
 await fs.mkdir(uploadsDir, { recursive: true });
 
 function corsHeaders(origin) {
-  const allowed = ["http://localhost:3000", "http://127.0.0.1:3000"];
+  const allowed = ["http://localhost:3000", "http://127.0.0.1:3000", "https://3dbadeneon.com"];
   return {
     "Access-Control-Allow-Origin": allowed.includes(origin || "") ? origin : "http://localhost:3000",
     "Access-Control-Allow-Headers": "Content-Type",
