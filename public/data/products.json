@@ -1113,18 +1113,6 @@
     "sizesEnabled": true,
     "sizeOptions": [
       {
-        "label": "10 cm",
-        "price": ""
-      },
-      {
-        "label": "12 cm",
-        "price": ""
-      },
-      {
-        "label": "23 cm",
-        "price": ""
-      },
-      {
         "label": " 6 × 22 × 11 cm",
         "price": "470"
       }
@@ -1135,7 +1123,7 @@
     "price50": "",
     "specialPrice": "Teklif Al",
     "remoteExtra": "",
-    "description": "<p><span style=\"font-family: Arial, sans-serif\">Erkek doktor figürü ve istediğiniz isimle kişiye özel hazırlanan dekoratif kalemlik. Doktorlar, sağlık çalışanları ve tıp öğrencileri için anlamlı bir hediye seçeneğidir.</span></p><p><strong>Ürün Açıklaması:</strong><br>Masanıza mesleğinizi yansıtan özel bir dokunuş katın. Erkek doktor figürüyle tasarlanan bu kalemlik, istediğiniz isim eklenerek size veya sevdiklerinize özel olarak hazırlanır.</p><p>Kalemlerinizi düzenli tutarken çalışma masanıza şık ve kişisel bir görünüm kazandırır. Doktorlara, sağlık çalışanlarına ve tıp öğrencilerine doğum günü, mezuniyet, yeni iş veya özel gün hediyesi olarak tercih edilebilir.</p><p><strong>Ürün Özellikleri:</strong></p><ul><li><p>Ölçü: 6 × 22 × 11 cm</p></li><li><p>Model: Erkek doktor</p></li><li><p>Kişiye özel isimle hazırlanır</p></li><li><p>3D baskı yöntemiyle üretilir</p></li><li><p>Dekoratif ve kullanışlı masaüstü kalemlik</p></li></ul><p><strong>Sipariş Bilgisi:</strong><br>Kalemliğin üzerine yazılmasını istediğiniz ismi sipariş sırasında belirtiniz.</p>",
+    "description": "<p><span style=\"font-family: Arial, sans-serif\">Erkek doktor figürü ve istediğiniz isimle kişiye özel hazırlanan dekoratif kalemlik. Doktorlar, sağlık çalışanları ve tıp öğrencileri için anlamlı bir hediye seçeneğidir.</span></p><p><strong>Ürün Açıklaması:</strong><br>Masanıza mesleğinizi yansıtan özel bir dokunuş katın. Erkek doktor figürüyle tasarlanan bu kalemlik, istediğiniz isim eklenerek size veya sevdiklerinize özel olarak hazırlanır.</p><p>Kalemlerinizi düzenli tutarken çalışma masanıza şık ve kişisel bir görünüm kazandırır. Doktorlara, sağlık çalışanlarına ve tıp öğrencilerine doğum günü, mezuniyet, yeni iş veya özel gün hediyesi olarak tercih edilebilir.</p><p><strong>Ürün Özellikleri:</strong></p><ul><li><p>Ölçü: 6 × 22 × 11 cm</p></li><li><p>Model: Erkek doktor</p></li><li><p>Kişiye özel isimle hazırlanır</p></li><li><p>3D baskı yöntemiyle üretilir</p></li><li><p>Dekoratif ve kullanışlı masaüstü kalemlik.</p></li></ul><p><strong>Sipariş Bilgisi:</strong><br>Kalemliğin üzerine yazılmasını istediğiniz ismi sipariş sırasında belirtiniz.</p>",
     "technical": "Üretim\nKatmanlı 3D baskı\n\nMalzeme\nPLA, PETG veya projeye uygun filament\n\nRenk\nProjeye göre tek veya çok renkli üretim\n\nDetay\nModelin yapısına uygun baskı hassasiyeti\n\nTeslimat\nKontrol edilmiş ve güvenli paketlenmiş ürün",
     "mainImage": "/uploads/ki-iye-zel-kadin-doktor-kalemlik-1793180273162/ana-1793220004247-pkuf1r.jpg",
     "hoverImages": [],
@@ -1148,18 +1136,6 @@
     "productType": "3D Maket",
     "sizesEnabled": true,
     "sizeOptions": [
-      {
-        "label": "10 cm",
-        "price": ""
-      },
-      {
-        "label": "12 cm",
-        "price": ""
-      },
-      {
-        "label": "23 cm",
-        "price": ""
-      },
       {
         "label": "6 × 22 × 11 cm",
         "price": "470"
