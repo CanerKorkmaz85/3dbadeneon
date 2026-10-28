@@ -126,33 +126,18 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { ok: true, products }, origin);
     }
 
-    if (req.url === "/publish" && req.method === "POST") {
-      await run(git, ["add", "-A"]);
-      const diff = await run(git, ["diff", "--cached", "--name-only"]);
+if (req.url === "/publish" && req.method === "POST") {
+  const cmd = process.env.ComSpec || "cmd.exe";
 
-      if (diff.stdout.trim()) {
-        const stamp = new Date().toLocaleString("tr-TR").replace(/[/:]/g, "-");
-        await run(git, ["commit", "-m", `Siteyi yayinla ${stamp}`]);
-      }
+  await run(cmd, ["/d", "/c", "npm.cmd run build:vinext"]);
+  await run(cmd, ["/d", "/c", "npx.cmd cf deploy --prebuilt --mode production"]);
 
-      await run(git, ["pull", "--rebase", "origin", "main"]);
-
-      const ahead = await run(git, ["rev-list", "--count", "origin/main..HEAD"]);
-      if (!Number(ahead.stdout.trim() || "0")) {
-        return send(res, 200, {
-          ok: true,
-          changed: false,
-          message: "GitHub ile esitlendi. Yayinlanacak yeni degisiklik yok.",
-        }, origin);
-      }
-
-      await run(git, ["push", "origin", "main"]);
-      return send(res, 200, {
-        ok: true,
-        changed: true,
-        message: "GitHub guncellendi. Cloudflare otomatik yayina alacak.",
-      }, origin);
-    }
+  return send(res, 200, {
+    ok: true,
+    changed: true,
+    message: "Site Cloudflare üzerinde yayınlandı ✓",
+  }, origin);
+}
 
     return send(res, 404, { error: "Bulunamadı." }, origin);
   } catch (error) {
