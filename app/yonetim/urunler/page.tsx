@@ -176,12 +176,33 @@ export default function ProductEntryPage() {
     }
   }
 
-  async function saveAndView() {
-    const id = await saveLocal(false);
-    if (!id) return;
-    window.open(`/urunler/${id}?t=${Date.now()}`, "_blank");
-    flash("Kaydedildi. Ürün sayfası yeni sekmede açıldı ✓");
+async function saveAndView() {
+  const preview = window.open("about:blank", "_blank");
+  if (!preview) {
+    flash("Önizleme için açılır pencerelere izin ver.");
+    return;
   }
+
+  const id = await saveLocal(false);
+  if (!id) {
+    preview.close();
+    return;
+  }
+
+  try {
+    preview.sessionStorage.setItem("3dbade-product-preview", JSON.stringify({
+      ...draft,
+      description: currentDescription(),
+      mainPreview: draft.mainImage,
+      hoverPreviews: draft.hoverImages || [],
+    }));
+    preview.location.replace("/yonetim/urun-onizleme");
+    flash("Kaydedildi. Önizleme açıldı ✓");
+  } catch {
+    preview.close();
+    flash("Ürün kaydedildi ancak önizleme açılamadı.");
+  }
+}
 
   async function publishSite() {
     const id = await saveLocal(false);
