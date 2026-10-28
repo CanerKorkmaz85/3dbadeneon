@@ -9,16 +9,24 @@ const dataDir = path.join(root, "public", "data");
 const productsFile = path.join(dataDir, "products.json");
 const uploadsDir = path.join(root, "public", "uploads");
 const port = 3002;
+const panelPort = 3000;
+const liveSiteUrl = "https://3dbadeneon.com";
 
 await fs.mkdir(dataDir, { recursive: true });
 await fs.mkdir(uploadsDir, { recursive: true });
 
 function corsHeaders(origin) {
-  const allowed = ["http://localhost:3000", "http://127.0.0.1:3000"];
+  const allowed = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://3dbadeneon.com",
+    "https://www.3dbadeneon.com",
+  ];
   return {
     "Access-Control-Allow-Origin": allowed.includes(origin || "") ? origin : "http://localhost:3000",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Private-Network": "true",
     "Cache-Control": "no-store",
   };
 }
@@ -101,7 +109,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { ok: true }, origin);
     }
 
-    if (req.url === "/products" && req.method === "GET") {
+    if (req.url?.split("?")[0] === "/products" && req.method === "GET") {
       try {
         const content = await fs.readFile(productsFile, "utf8");
         return send(res, 200, { products: JSON.parse(content) }, origin);
@@ -158,6 +166,54 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+server.on("error", (error) => {
+  if (error?.code === "EADDRINUSE") {
+    console.log(`3Dbade yerel editor servisi zaten acik: http://127.0.0.1:${port}`);
+    return;
+  }
+  throw error;
+});
+
 server.listen(port, "127.0.0.1", () => {
   console.log(`3Dbade yerel editor servisi: http://127.0.0.1:${port}`);
+});
+
+const panelServer = http.createServer(async (req, res) => {
+  try {
+    const target = new URL(req.url || "/", liveSiteUrl);
+    const headers = {};
+    for (const name of ["accept", "accept-language", "user-agent"]) {
+      if (req.headers[name]) headers[name] = req.headers[name];
+    }
+
+    const response = await fetch(target, {
+      method: req.method === "HEAD" ? "HEAD" : "GET",
+      headers,
+      redirect: "follow",
+    });
+
+    res.statusCode = response.status;
+    const contentType = response.headers.get("content-type");
+    if (contentType) res.setHeader("Content-Type", contentType);
+    res.setHeader("Cache-Control", "no-store");
+
+    if (req.method === "HEAD") return res.end();
+    const body = Buffer.from(await response.arrayBuffer());
+    res.end(body);
+  } catch (error) {
+    res.writeHead(502, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end(`3DBadeNeon paneli acilamadi: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`);
+  }
+});
+
+panelServer.on("error", (error) => {
+  if (error?.code === "EADDRINUSE") {
+    console.log(`3Dbade urun paneli zaten acik: http://localhost:${panelPort}/yonetim/urunler`);
+    return;
+  }
+  throw error;
+});
+
+panelServer.listen(panelPort, "127.0.0.1", () => {
+  console.log(`3Dbade urun paneli: http://localhost:${panelPort}/yonetim/urunler`);
 });

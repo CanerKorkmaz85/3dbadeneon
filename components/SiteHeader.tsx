@@ -68,10 +68,10 @@ export default function SiteHeader() {
         </div>
       </header>
       <nav className="collection-nav" aria-label="Ana menü">
-        <Link href="/tasarla">Neon Tasarla</Link>
-        <Link href="/#urunler">Çok Satanlar</Link>
-        <Link href="/#isletmeler">Kafe &amp; Restoranlar</Link>
-        <Link href="/magaza">Tüm Ürünler</Link>
+        <Link href="/3d-baski">3D Baskı</Link>
+        <Link href="/magaza">Neon LED</Link>
+        <Link href="/tabela-sistemleri">Tabela Sistemleri</Link>
+        <Link href="/paslanmaz-metal">Paslanmaz &amp; Metal</Link>
         <Link href="/#sss">Sık Sorulan Sorular</Link>
         <Link href="/iletisim">İletişim</Link>
       </nav>

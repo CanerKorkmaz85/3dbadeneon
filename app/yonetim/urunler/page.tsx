@@ -5,9 +5,15 @@
 import { useEffect, useRef, useState } from "react";
 import { productCopyHtml, sanitizeProductHtml } from "../../../components/FormattedProductCopy";
 import {
+  defaultSizeOptions,
+  normalizeAdminProduct,
   productId,
+  productTypes,
   readAdminProducts,
+  technicalTemplates,
   type AdminProduct,
+  type ProductSizeOption,
+  type ProductType,
   writeAdminProducts,
 } from "../../../lib/admin-products";
 
@@ -24,35 +30,28 @@ const categories = [
   "Etkinlik & Organizasyon",
   "Ev Dekorasyon",
   "Ek Malzemeler",
+  "3D Maket",
+  "Tabela",
+  "Paslanmaz",
+  "Kutu Harf",
 ];
-
-const technicalTemplate = `Ölçü
-30, 40, 50 cm veya özel ölçü
-
-Malzeme
-4 mm şeffaf, kontur kesim pleksi
-
-Aydınlatma
-12V esnek silikon neon LED
-
-Kablo
-Yaklaşık 2 metre
-
-Paket içeriği
-Neon dekor ve 12V adaptör`;
 
 type Draft = Omit<AdminProduct, "id">;
 
 const emptyDraft: Draft = {
   title: "",
   category: categories[0],
+  productType: "Neon",
+  sizesEnabled: true,
+  sizeOptions: defaultSizeOptions("Neon"),
+  remoteEnabled: true,
   price30: "",
   price40: "",
   price50: "",
   specialPrice: "Teklif Al",
   remoteExtra: "250",
   description: "",
-  technical: technicalTemplate,
+  technical: technicalTemplates.Neon,
   mainImage: "",
   hoverImages: [],
 };
@@ -68,7 +67,7 @@ export default function ProductEntryPage() {
   const [localReady, setLocalReady] = useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
 
-  function update(field: keyof Draft, value: string | string[]) {
+  function update<K extends keyof Draft>(field: K, value: Draft[K]) {
     setDraft((current) => ({ ...current, [field]: value }));
   }
 
@@ -93,8 +92,9 @@ export default function ProductEntryPage() {
         const response = await fetch(`${editorUrl}/products?t=${Date.now()}`, { cache: "no-store" });
         const result = await response.json();
         if (!cancelled && Array.isArray(result.products) && result.products.length) {
-          setProducts(result.products);
-          try { writeAdminProducts(result.products); } catch {}
+          const normalizedProducts = result.products.map(normalizeAdminProduct);
+          setProducts(normalizedProducts);
+          try { writeAdminProducts(normalizedProducts); } catch {}
         }
       } catch {
         if (!cancelled) {
@@ -121,12 +121,18 @@ export default function ProductEntryPage() {
     }
 
     const id = selectedId || productId(draft.title);
+    const sizePrice = (label: string) => draft.sizeOptions.find((option) => option.label === label)?.price || "";
     const product: AdminProduct = {
       ...draft,
       id,
       title: draft.title.trim(),
       description: currentDescription(),
       hoverImages: draft.hoverImages || [],
+      price30: sizePrice("30 cm"),
+      price40: sizePrice("40 cm"),
+      price50: sizePrice("50 cm"),
+      specialPrice: sizePrice("Özel ölçü") || draft.specialPrice,
+      remoteExtra: draft.remoteEnabled ? draft.remoteExtra : "",
     };
 
     const next = selectedId
@@ -194,26 +200,65 @@ export default function ProductEntryPage() {
   }
 
   function selectProduct(product: AdminProduct) {
-    setSelectedId(product.id);
+    const normalized = normalizeAdminProduct(product);
+    setSelectedId(normalized.id);
     setDraft({
-      title: product.title,
-      category: product.category,
-      price30: product.price30,
-      price40: product.price40,
-      price50: product.price50,
-      specialPrice: product.specialPrice,
-      remoteExtra: product.remoteExtra,
-      description: product.description,
-      technical: product.technical,
-      mainImage: product.mainImage,
-      hoverImages: product.hoverImages || [],
+      title: normalized.title,
+      category: normalized.category,
+      productType: normalized.productType,
+      sizesEnabled: normalized.sizesEnabled,
+      sizeOptions: normalized.sizeOptions,
+      remoteEnabled: normalized.remoteEnabled,
+      price30: normalized.price30,
+      price40: normalized.price40,
+      price50: normalized.price50,
+      specialPrice: normalized.specialPrice,
+      remoteExtra: normalized.remoteExtra,
+      description: normalized.description,
+      technical: normalized.technical,
+      mainImage: normalized.mainImage,
+      hoverImages: normalized.hoverImages || [],
     });
   }
 
   function newProduct() {
     setSelectedId(null);
-    setDraft(emptyDraft);
+    setDraft({ ...emptyDraft, sizeOptions: defaultSizeOptions("Neon") });
     if (descriptionRef.current) descriptionRef.current.innerHTML = "";
+  }
+
+  function changeProductType(productType: ProductType) {
+    const sizesEnabled = productType === "Neon" || productType === "3D Maket";
+    const category = productType === "3D Maket"
+      ? "3D Maket"
+      : productType === "Kutu Harf"
+        ? "Kutu Harf"
+        : productType === "Paslanmaz"
+          ? "Paslanmaz"
+          : draft.category;
+    setDraft((current) => ({
+      ...current,
+      productType,
+      category,
+      sizesEnabled,
+      sizeOptions: defaultSizeOptions(productType),
+      remoteEnabled: productType === "Neon",
+      remoteExtra: productType === "Neon" ? current.remoteExtra || "250" : "",
+      technical: technicalTemplates[productType],
+    }));
+  }
+
+  function updateSize(index: number, field: keyof ProductSizeOption, value: string) {
+    update("sizeOptions", draft.sizeOptions.map((option, optionIndex) =>
+      optionIndex === index ? { ...option, [field]: value } : option));
+  }
+
+  function addSize() {
+    update("sizeOptions", [...draft.sizeOptions, { label: "", price: "" }]);
+  }
+
+  function removeSize(index: number) {
+    update("sizeOptions", draft.sizeOptions.filter((_, optionIndex) => optionIndex !== index));
   }
 
   async function deleteProduct() {
@@ -354,16 +399,45 @@ export default function ProductEntryPage() {
           </div>
 
           <label>Ürün adı<input value={draft.title} onChange={(e) => update("title", e.target.value)} /></label>
+          <label>Ürün tipi / teknik şablon
+            <select value={draft.productType} onChange={(e) => changeProductType(e.target.value as ProductType)}>
+              {productTypes.map((productType) => <option key={productType}>{productType}</option>)}
+            </select>
+          </label>
+          <button type="button" className="entry-template-reset" onClick={() => changeProductType(draft.productType)}>SEÇİLİ ŞABLONU YENİDEN UYGULA</button>
+          <small className="entry-help">Ürün tipini değiştirdiğinde veya şablonu yeniden uyguladığında ölçü, kumanda ve teknik özellikler o ürüne göre hazırlanır. Teknik metni aşağıdan istediğin gibi değiştirebilirsin.</small>
           <label>Kategori<select value={draft.category} onChange={(e) => update("category", e.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
 
-          <div className="entry-prices">
-            <label>30 cm fiyatı<input value={draft.price30} onChange={(e) => update("price30", e.target.value)} /></label>
-            <label>40 cm fiyatı<input value={draft.price40} onChange={(e) => update("price40", e.target.value)} /></label>
-            <label>50 cm fiyatı<input value={draft.price50} onChange={(e) => update("price50", e.target.value)} /></label>
-            <label>Özel ölçü<input value={draft.specialPrice} onChange={(e) => update("specialPrice", e.target.value)} /></label>
+          <div className="entry-option-panel">
+            <label className="entry-switch">
+              <input type="checkbox" checked={draft.sizesEnabled} onChange={(e) => update("sizesEnabled", e.target.checked)} />
+              <span>Ölçü seçeneklerini göster</span>
+            </label>
+            {draft.sizesEnabled ? (
+              <div className="entry-size-editor">
+                <div className="entry-size-head"><b>Ölçü adı</b><b>Fiyat / Teklif</b><span /></div>
+                {draft.sizeOptions.map((option, index) => (
+                  <div className="entry-size-row" key={`${index}-${option.label}`}>
+                    <input aria-label={`${index + 1}. ölçü adı`} placeholder="Örn. 10 cm" value={option.label} onChange={(e) => updateSize(index, "label", e.target.value)} />
+                    <input aria-label={`${index + 1}. ölçü fiyatı`} placeholder="Örn. 1250 veya Teklif Al" value={option.price} onChange={(e) => updateSize(index, "price", e.target.value)} />
+                    <button type="button" onClick={() => removeSize(index)} aria-label={`${option.label || index + 1}. ölçüyü sil`}>SİL</button>
+                  </div>
+                ))}
+                <button type="button" className="entry-add-size" onClick={addSize}>+ YENİ ÖLÇÜ EKLE</button>
+              </div>
+            ) : (
+              <label>Tek fiyat veya teklif metni<input value={draft.specialPrice} placeholder="Örn. 2500 veya Teklif Al" onChange={(e) => update("specialPrice", e.target.value)} /></label>
+            )}
           </div>
 
-          <label>Kumandalı ek fiyatı<input value={draft.remoteExtra} onChange={(e) => update("remoteExtra", e.target.value)} /></label>
+          <div className="entry-option-panel">
+            <label className="entry-switch">
+              <input type="checkbox" checked={draft.remoteEnabled} onChange={(e) => update("remoteEnabled", e.target.checked)} />
+              <span>Kumanda seçeneğini göster</span>
+            </label>
+            {draft.remoteEnabled && <label>Kumandalı ek fiyatı<input value={draft.remoteExtra} onChange={(e) => update("remoteExtra", e.target.value)} /></label>}
+            {!draft.remoteEnabled && <small className="entry-help">Bu üründe kumanda seçeneği ürün sayfasında gösterilmeyecek.</small>}
+          </div>
 
           <div className="entry-description-editor">
             <label>Ürün açıklaması</label>
@@ -397,7 +471,7 @@ export default function ProductEntryPage() {
             />
           </div>
 
-          <label>Teknik özellikler<textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} /></label>
+          <label>Teknik özellikler — {draft.productType}<textarea value={draft.technical} onChange={(e) => update("technical", e.target.value)} /></label>
 
           <div className="entry-buttons" style={{ flexWrap: "wrap" }}>
             <button type="button" disabled={saving || publishing} onClick={() => saveLocal()}>{saving ? "KAYDEDİLİYOR..." : "KAYDET"}</button>

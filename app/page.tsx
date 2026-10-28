@@ -129,14 +129,6 @@ const teamVideoScenes = [
     alt: "Trabzonspor neon tabela yakın ürün görünümü",
   },
 ];
-const businesses = [
-  "Kafeler & Restoranlar",
-  "Berber & Kuaför",
-  "Mağaza & Ofis",
-  "Spor Salonu",
-  "Etkinlik & Organizasyon",
-  "Ev Dekorasyonu",
-];
 const reviews = [
   {
     name: "Elif A.",
@@ -223,78 +215,68 @@ const popArtCollection = [
     title: "Tropikal Kuru Kafa Neon",
   },
 ];
-const venueCollections = [
+const threeDPrintingCards = [
   {
-    title: "Kafe & Restoranlar",
-    cards: [
-      {
-        src: "/products/business-burger-main.jpg",
-        hoverSrc: "/products/business-burger-hover.jpg",
-        alt: "Burger neon tabela",
-        title: "Hamburger Neon",
-        fit: "venue-image-contain",
-      },
-      {
-        src: "/products/texts/business-wc-main.jfif",
-        hoverSrc: "/products/texts/business-acik-hover.jfif",
-        alt: "WC / Açık Neon",
-        title: "WC / Açık Neon",
-      },
-      {
-        src: "/products/catalog/business-gamer-main.png",
-        hoverSrc: "/products/catalog/business-gamer-hover.jpg",
-        alt: "Gamer el neon tabela",
-        title: "Gamer El Neon",
-        fit: "venue-image-contain",
-      },
-    ],
+    src: "/uploads/kardan-adam-fig-r-1792705094255/ana-1792705094289-n2lp9h.jpg",
+    hoverSrc:
+      "/uploads/kardan-adam-fig-r-1792705094255/galeri-1-1792705094293-6dsowj.jpg",
+    alt: "3D baskı kardan adam figürü",
+    title: "Kardan Adam Figürü",
   },
   {
-    title: "Takım Neonları",
-    cards: [
-      {
-        src: "/video/teams/fenerbahce-wall.png",
-        hoverSrc: "/video/teams/fenerbahce-flat.jpg",
-        alt: "Fenerbahçe neon duvar uygulaması",
-        title: "Fenerbahçe Neon",
-      },
-      {
-        src: "/video/teams/galatasaray-wall.png",
-        hoverSrc: "/video/teams/galatasaray-flat.jpg",
-        alt: "Galatasaray neon duvar uygulaması",
-        title: "Galatasaray Neon",
-      },
-      {
-        src: "/api/urun-gorsel/takimlar/besiktas/ana.jpg",
-        hoverSrc: "/api/urun-gorsel/takimlar/besiktas/hover.jpg",
-        alt: "Beşiktaş neon duvar uygulaması",
-        title: "Beşiktaş Neon",
-      },
-    ],
+    src: "/uploads/noel-baba-fig-r-1792705971665/ana-1792705971679-vc0nr0.jpg",
+    hoverSrc:
+      "/uploads/noel-baba-fig-r-1792705971665/galeri-1-1792705971681-xd2059.jpg",
+    alt: "3D baskı Noel Baba figürü",
+    title: "Noel Baba Figürü",
   },
   {
-    title: "Pop-Art Neonları",
-    cards: [
-      {
-        src: "/products/catalog/kopek-patron.jpg",
-        hoverSrc: "/products/catalog/kopek-mc.jpg",
-        alt: "Pop-art neon mekan uygulaması",
-        title: "Köpek Patron Neon",
-      },
-      {
-        src: "/products/catalog/kuru-kafa-papatya.jpg",
-        hoverSrc: "/products/catalog/tropikal-kuru-kafa.jpg",
-        alt: "Pop-art neon mekan uygulaması",
-        title: "Kuru Kafa & Papatya Neon",
-      },
-      {
-        src: "/products/catalog/gamer-el.jpg",
-        hoverSrc: "/products/catalog/comic-ouch.jpg",
-        alt: "Pop-art neon mekan uygulaması",
-        title: "Gamer El Neon",
-      },
-    ],
+    src: "/uploads/kardan-adam-fig-r-1792705094255/galeri-2-1792705094294-706ccv.jpg",
+    hoverSrc:
+      "/uploads/kardan-adam-fig-r-1792705094255/galeri-3-1792705094296-l988nz.jpg",
+    alt: "Özel ölçü 3D baskı dekoratif figür",
+    title: "Özel Ölçü Figürler",
   },
+];
+
+const signageCards = [
+  {
+    title: "Kutu Harf Sistemleri",
+    description: "3 boyutlu, ışıklı veya ışıksız tabela çözümleri",
+    href: "/tabela-sistemleri/kutu-harf",
+    tone: "letter",
+    image: "/signage/kutu-harf.jpg",
+  },
+  {
+    title: "Işıklı Tabelalar",
+    description: "Gece ve gündüz yüksek görünürlük",
+    href: "/tabela-sistemleri",
+    tone: "light",
+    image: "/signage/isikli-tabela.jpg",
+  },
+  {
+    title: "Cephe Tabelaları",
+    description: "Mağaza, restoran ve kurumsal yapılar için",
+    href: "/tabela-sistemleri",
+    tone: "facade",
+    image: "/signage/cephe-tabelasi.jpg",
+  },
+  {
+    title: "Totem & Yönlendirme",
+    description: "İç ve dış mekân yönlendirme sistemleri",
+    href: "/tabela-sistemleri",
+    tone: "totem",
+    image: "/signage/totem-yonlendirme.jpg",
+  },
+];
+
+const metalCards = [
+  "Mimari Paslanmaz Uygulamalar",
+  "Dekoratif Metal",
+  "Özel Metal İmalat",
+  "Paslanmaz Kaplama",
+  "İç Mekân Metal Uygulamaları",
+  "Dış Mekân Metal Uygulamaları",
 ];
 
 function HeaderIcon({ name }: { name: "search" | "account" | "cart" }) {
@@ -484,10 +466,10 @@ export default function Home() {
         )}
       </header>
       <nav className="collection-nav">
-        <a href="/tasarla">Neon Tasarla</a>
-        <a href="#urunler">Çok Satanlar</a>
-        <a href="#isletmeler">Kafe & Restoranlar</a>
-        <a href="/magaza">Tüm Ürünler</a>
+        <a href="/3d-baski">3D Baskı</a>
+        <a href="/magaza">Neon LED</a>
+        <a href="/tabela-sistemleri">Tabela Sistemleri</a>
+        <a href="/paslanmaz-metal">Paslanmaz &amp; Metal</a>
         <a href="#sss">Sık Sorulan Sorular</a>
         <Link href="/iletisim">İletişim</Link>
       </nav>
@@ -926,136 +908,100 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="venue-collection-section">
-        <p>GERÇEK MEKAN GÖRSELLERİ</p>
-        {venueCollections.map((collection) => (
-          <div className="venue-collection" key={collection.title}>
-            <div className="venue-title-row">
-              <h2>{collection.title}</h2>
-              <a href="/magaza">TÜM ÜRÜNLERİ GÖR →</a>
+      <section id="3d-baski" className="venue-collection-section home-3d-section">
+        <p>3D BASKI KOLEKSİYONU</p>
+        <div className="venue-collection">
+          <div className="venue-title-row">
+            <div>
+              <h2>Fikrini üç boyutlu üretelim.</h2>
             </div>
-            <div className="venue-grid">
-              {collection.cards.map((card) => (
-                <article className="venue-card-wrap" key={card.src}>
-                  <a
-                    href="#ozel-tasarim"
-                    className={`venue-card ${"fit" in card ? card.fit : ""}`}
-                  >
-                    <Image
-                      className="venue-image venue-image-main"
-                      src={card.src}
-                      alt={card.alt}
-                      width={1200}
-                      height={900}
-                    />
-                    <Image
-                      className="venue-image venue-image-hover"
-                      src={card.hoverSrc}
-                      alt=""
-                      aria-hidden="true"
-                      width={1200}
-                      height={900}
-                    />
-                  </a>
-                  <span className="venue-card-title">{card.title}</span>
-                </article>
-              ))}
-            </div>
+            <a href="/3d-baski">3D BASKILARI İNCELE →</a>
           </div>
-        ))}
-      </section>
-      <section className="burger-gallery">
-        <div>
-          <p>GERÇEK MEKAN ÖRNEKLERİ</p>
-          <h2>Burger neon, mekanında nasıl görünür?</h2>
-          <span>
-            Farklı restoran ve kafe atmosferlerinden uygulama örnekleri.
-          </span>
-        </div>
-        <div className="burger-gallery-grid">
-          <div className="home-gallery-image">
-            <Image
-              src="/products/burger/venue-1.jpg"
-              alt="Diner ortamında burger neon"
-              width={680}
-              height={1024}
-            />
-          </div>
-          <div className="home-gallery-image">
-            <Image
-              src="/products/burger/venue-2.jpg"
-              alt="Mutfakta burger neon uygulaması"
-              width={680}
-              height={1024}
-            />
-          </div>
-          <div className="home-gallery-image">
-            <Image
-              src="/products/burger/venue-3.jpg"
-              alt="Restoranda burger neon uygulaması"
-              width={680}
-              height={1024}
-            />
-          </div>
-          <div className="home-gallery-image">
-            <Image
-              src="/products/burger/venue-4.jpg"
-              alt="Kafede burger neon uygulaması"
-              width={680}
-              height={1024}
-            />
+          <div className="venue-grid">
+            {threeDPrintingCards.map((card) => (
+              <article className="venue-card-wrap" key={card.src}>
+                <a href="/3d-baski" className="venue-card">
+                  <Image
+                    className="venue-image venue-image-main"
+                    src={card.src}
+                    alt={card.alt}
+                    width={1200}
+                    height={900}
+                  />
+                  <Image
+                    className="venue-image venue-image-hover"
+                    src={card.hoverSrc}
+                    alt=""
+                    aria-hidden="true"
+                    width={1200}
+                    height={900}
+                  />
+                </a>
+                <span className="venue-card-title">{card.title}</span>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-      <section id="isletmeler" className="business-section">
-        <div className="business-copy">
-          <p>KAFE & RESTORANLAR</p>
-          <h2>
-            Mekanına göre
-            <br />
-            <em>doğru ışık.</em>
-          </h2>
+      <section id="tabela-sistemleri" className="home-service-section home-signage-section">
+        <div className="home-service-heading">
+          <p>TABELA SİSTEMLERİ</p>
+          <h2>Markanız için doğru tabela çözümü.</h2>
           <span>
-            Markanı görünür kılan, müşterinin dikkatini çeken ve mekanının
-            atmosferini tamamlayan neon çözümler.
+            Malzeme, aydınlatma ve uygulama biçimini mekanınıza göre birlikte
+            belirleyelim.
           </span>
-          <a href="#ozel-tasarim">ÜCRETSİZ TEKLİF AL →</a>
         </div>
-        <div className="business-grid">
-          {businesses.map((business, index) => (
-            <a
-              href="#ozel-tasarim"
-              key={business}
-              className={`business-card card-${index + 1}`}
+        <div className="home-signage-grid">
+          {signageCards.map((card) => (
+            <Link
+              href={card.href}
+              className={`home-signage-card tone-${card.tone}`}
+              key={card.title}
             >
-              <span>{business}</span>
-              <b>→</b>
-            </a>
+              <Image
+                className="signage-card-image"
+                src={card.image}
+                alt=""
+                aria-hidden="true"
+                width={1200}
+                height={720}
+              />
+              <div>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+                <b>İncele →</b>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
-      <section id="ozel-tasarim" className="personal-section">
-        <div className="personal-art">
-          <div className="personal-neon">
-            SENİN
-            <br />
-            <b>LOGON</b>
-          </div>
-        </div>
-        <div className="personal-copy">
-          <p>KİŞİYE ÖZEL TASARIM</p>
-          <h2>
-            Logon, yazın,
-            <br />
-            <em>senin ışığın.</em>
-          </h2>
+      <section id="paslanmaz-metal" className="home-service-section home-metal-section">
+        <div className="home-service-heading">
+          <p>PASLANMAZ &amp; METAL</p>
+          <h2>Detayda güçlü, mekânda kalıcı.</h2>
           <span>
-            Logonu veya fikrini gönder. Tasarım ekibimiz ölçü, renk ve malzemeyi
-            birlikte netleştirsin; sana özel üretsin.
+            Kutu harften ayrı; mimari, dekoratif ve özel üretim metal
+            uygulamalar.
           </span>
-          <a href="mailto:info@3dbadeneon.com?subject=Özel%20Tasarım%20Talebi">
-            TASARIM TALEBİ OLUŞTUR
-          </a>
+        </div>
+        <div className="home-metal-grid">
+          {metalCards.map((title, index) => (
+            <Link
+              href="/paslanmaz-metal"
+              className={`home-metal-card metal-tone-${index + 1}`}
+              key={title}
+            >
+              <span className="metal-card-number" aria-hidden="true">
+                0{index + 1}
+              </span>
+              <span className="metal-card-shape" aria-hidden="true" />
+              <span>
+                <b>{title}</b>
+                <small>İncele →</small>
+              </span>
+            </Link>
+          ))}
         </div>
       </section>
       <section className="why-section">
@@ -1127,6 +1073,34 @@ export default function Home() {
         <details>
           <summary>Ürünlerin garantisi var mı?</summary>
           <p>Her ürün üretim hatalarına karşı iki yıl garantilidir.</p>
+        </details>
+        <details>
+          <summary>3D baskıda özel ölçü üretim yapılıyor mu?</summary>
+          <p>
+            Evet. 10 cm, 12 cm ve 23 cm gibi standart olmayan ölçüler dahil,
+            modelinize ve kullanım alanınıza göre özel üretim yapılabilir.
+          </p>
+        </details>
+        <details>
+          <summary>Kutu harf ışıklı veya ışıksız yapılabilir mi?</summary>
+          <p>
+            Evet. Paslanmaz, alüminyum veya pleksi malzemeyle; önden, arkadan
+            ışıklı ya da ışıksız olarak üretilebilir.
+          </p>
+        </details>
+        <details>
+          <summary>Paslanmaz ve metal uygulamalarda ölçü nasıl belirlenir?</summary>
+          <p>
+            Bu ürünlerde sabit ölçü seçimi yoktur. Uygulama alanı incelenir ve
+            projeye özel ölçülendirme ile teklif hazırlanır.
+          </p>
+        </details>
+        <details>
+          <summary>Dış mekân uygulamaları hava koşullarına dayanıklı mı?</summary>
+          <p>
+            Malzeme ve montaj yöntemi dış mekân şartlarına göre seçilir.
+            Projeye uygun paslanmaz, boya ve aydınlatma çözümleri sunulur.
+          </p>
         </details>
       </section>
       <footer id="iletisim" className="store-footer">

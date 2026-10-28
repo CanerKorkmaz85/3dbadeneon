@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+  normalizeAdminProduct,
   readAdminProducts,
   type AdminProduct,
   writeAdminProducts,
@@ -16,9 +17,11 @@ type PriceRow = {
   cm50: number;
   remoteExtra: number;
   special: string;
+  sizesEnabled: boolean;
+  remoteEnabled: boolean;
 };
 function readRows(): PriceRow[] {
-  return readAdminProducts().map((product) => ({
+  return readAdminProducts().map(normalizeAdminProduct).map((product) => ({
     id: product.id,
     product: product.title,
     cm30: Number(product.price30) || 0,
@@ -26,6 +29,8 @@ function readRows(): PriceRow[] {
     cm50: Number(product.price50) || 0,
     remoteExtra: Number(product.remoteExtra) || 0,
     special: product.specialPrice,
+    sizesEnabled: product.sizesEnabled,
+    remoteEnabled: product.remoteEnabled,
   }));
 }
 
@@ -60,8 +65,14 @@ export default function PriceManagementPage() {
         price30: String(row.cm30),
         price40: String(row.cm40),
         price50: String(row.cm50),
-        remoteExtra: String(row.remoteExtra),
+        remoteExtra: row.remoteEnabled ? String(row.remoteExtra) : "",
         specialPrice: row.special,
+        sizeOptions: product.sizeOptions.map((option) => {
+          if (option.label === "30 cm") return { ...option, price: String(row.cm30) };
+          if (option.label === "40 cm") return { ...option, price: String(row.cm40) };
+          if (option.label === "50 cm") return { ...option, price: String(row.cm50) };
+          return option;
+        }),
       };
     });
     writeAdminProducts(next);
@@ -109,6 +120,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm30}
                       onChange={(event) =>
                         updateRow(row.id, "cm30", Number(event.target.value))
@@ -119,6 +131,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm40}
                       onChange={(event) =>
                         updateRow(row.id, "cm40", Number(event.target.value))
@@ -129,6 +142,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm50}
                       onChange={(event) =>
                         updateRow(row.id, "cm50", Number(event.target.value))
@@ -139,6 +153,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.remoteEnabled}
                       value={row.remoteExtra}
                       onChange={(event) =>
                         updateRow(
@@ -172,8 +187,8 @@ export default function PriceManagementPage() {
             </strong>
           )}
           <small>
-            Fiyatlar TL olarak girilir. Kumanda sütunundaki rakam, seçildiğinde
-            ölçü fiyatına eklenir.
+            30/40/50 cm dışındaki özel ölçüler, ölçüyü kapatma ve kumanda ayarı
+            ÜRÜN GİRİŞİ sayfasından yönetilir.
           </small>
         </div>
       </section>

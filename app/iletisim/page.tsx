@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, type FormEvent } from "react";
 
 const address =
@@ -98,6 +99,25 @@ export default function ContactPage() {
             </small>
           )}
         </form>
+      </section>
+      <section className="contact-workshop" aria-labelledby="workshop-title">
+        <div className="contact-workshop-copy">
+          <p>ATÖLYEMİZ</p>
+          <h2 id="workshop-title">Dükkanımızdan bir kare.</h2>
+          <span>
+            Neonlarımızı yakından görmek ve projenizi birlikte konuşmak için
+            mağaza ve atölyemizi ziyaret edebilirsiniz.
+          </span>
+        </div>
+        <figure className="contact-workshop-photo">
+          <Image
+            src="/contact/dukkan.jpg"
+            alt="3Dbade Neon mağaza ve atölyesinin neonlarla aydınlatılmış vitrini"
+            width={1200}
+            height={1600}
+            sizes="(max-width: 780px) calc(100vw - 40px), 630px"
+          />
+        </figure>
       </section>
       <section className="contact-map">
         <div>

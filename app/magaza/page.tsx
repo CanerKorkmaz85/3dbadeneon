@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { readAdminProducts, type AdminProduct } from "../../lib/admin-products";
+import { normalizeAdminProduct, readAdminProducts, type AdminProduct } from "../../lib/admin-products";
 
 const categories = [
   "Astronot Koleksiyonu",
@@ -17,6 +17,10 @@ const categories = [
   "Spor Salonu",
   "Takımlar",
   "Ek Malzemeler",
+  "3D Maket",
+  "Tabela",
+  "Paslanmaz",
+  "Kutu Harf",
 ];
 
 function matchesCategory(product: Pick<AdminProduct, "id" | "title" | "category">, category: string) {
@@ -34,23 +38,29 @@ function matchesCategory(product: Pick<AdminProduct, "id" | "title" | "category"
 async function loadProducts(): Promise<AdminProduct[]> {
   try {
     const response = await fetch(`/data/products.json?t=${Date.now()}`, { cache: "no-store" });
-    if (response.ok) return (await response.json()) as AdminProduct[];
+    if (response.ok) return ((await response.json()) as AdminProduct[]).map(normalizeAdminProduct);
   } catch {}
 
   const fallback = await fetch(`/api/products?t=${Date.now()}`, { cache: "no-store" });
   if (!fallback.ok) throw new Error("Ürünler alınamadı.");
-  return (await fallback.json()) as AdminProduct[];
+  return ((await fallback.json()) as AdminProduct[]).map(normalizeAdminProduct);
+}
+
+function startingPrice(product: AdminProduct) {
+  const values = (product.sizesEnabled ? product.sizeOptions.map((option) => option.price) : [product.specialPrice])
+    .map(Number)
+    .filter((value) => value > 0);
+  return values.length ? Math.min(...values) : null;
 }
 
 export default function MagazaPage() {
-  const [selectedCategory, setSelectedCategory] = useState("Tümü");
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    if (typeof window === "undefined") return "Tümü";
+    const requested = new URLSearchParams(window.location.search).get("kategori");
+    return requested && categories.includes(requested) ? requested : "Tümü";
+  });
   const [, setCartCount] = useState(0);
   const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
-
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("kategori");
-    if (requested && categories.includes(requested)) setSelectedCategory(requested);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,7 +109,7 @@ export default function MagazaPage() {
                 <div>
                   <small>{product.category}</small>
                   <h2>{product.title}</h2>
-                  <span className="product-price"><del>₺4.900</del><b>₺{Number(product.price40 || 4100).toLocaleString("tr-TR")}</b></span>
+                  <span className="product-price">{startingPrice(product) ? <><small>Başlangıç</small><b>₺{startingPrice(product)?.toLocaleString("tr-TR")}</b></> : <b>TEKLİF AL</b>}</span>
                   <button onClick={() => setCartCount((count) => count + 1)}>SEPETE EKLE +</button>
                 </div>
               </article>
