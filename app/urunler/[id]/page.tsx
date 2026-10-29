@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import FormattedProductCopy from "../../../components/FormattedProductCopy";
 import { createEmptyProduct, normalizeAdminProduct, readAdminProducts, type AdminProduct } from "../../../lib/admin-products";
+import { addToCart } from "../../../lib/cart";
 
 async function loadProducts(): Promise<AdminProduct[]> {
   try {
@@ -62,16 +63,29 @@ export default function ManagedProductPage() {
     const [heading, ...detail] = item.split("\n");
     return { heading, detail: detail.join(" ") };
   });
-  const orderText = product
-    ? `Merhaba, 3DBadeNeon sitesinden sipariş vermek istiyorum.\n\nÜrün: ${product.title}\nÖlçü: ${size || "Standart"}\nAdet: ${quantity}\nToplam: ${total ? `₺${total.toLocaleString("tr-TR")}` : "Teklif Al"}`
-    : "";
-  const orderUrl = `https://wa.me/905327079923?text=${encodeURIComponent(orderText)}`;
+function handleAddToCart() {
+  if (!product) return;
+  try {
+    addToCart({
+      id: product.id,
+      title: product.title,
+      image: product.mainImage,
+      size: size || "Standart",
+      remote: product.remoteEnabled ? remote : "",
+      quantity,
+      unitPrice: basePrice > 0 ? basePrice + remotePrice : null,
+    });
+    window.location.assign("/odeme");
+  } catch {
+    window.alert("Sepet kaydedilemedi. Tarayıcı depolama izinlerini kontrol et.");
+  }
+}
 
   if (!product) return <main className="product-page product-not-found"><h1>Ürün bulunamadı.</h1><Link href="/magaza">TÜM ÜRÜNLERE DÖN</Link></main>;
 
   return (
     <main className="product-page">
-      <div className="product-breadcrumb"><Link href="/">Ana Sayfa</Link><span>›</span><Link href={product.category === "3D Maket" || product.category === "3D Baskı" ? "/3d-baski" : "/magaza"}>{product.category === "3D Maket" ? "3D Baskı" : product.category}</Link><span>›</span><b>{product.title}</b></div>
+      <div className="product-breadcrumb"><Link href="/">Ana Sayfa</Link><span>›</span><Link href={product.productType === "3D Maket" ? "/3d-baski" : "/magaza"}>{product.productType === "3D Maket" ? "3D Baskı" : product.category}</Link><span>›</span><b>{product.title}</b></div>
       <section className="product-main">
         <div className="product-gallery">
           <div className="product-thumbnails">{images.map((image, index) => <button key={`${image}-${index}`} className={imageIndex === index ? "selected" : ""} onClick={() => setImageIndex(index)} aria-label={`${index + 1}. görseli göster`}><img src={image} alt="" /></button>)}</div>
@@ -83,7 +97,16 @@ export default function ManagedProductPage() {
           <div className="product-price"><strong>{total ? `₺${total.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong><small>KDV dahil · Ücretsiz kargo</small></div>
           {product.sizesEnabled && product.sizeOptions.length > 0 && <div className="product-choice"><b>Boyut <small>{size}</small></b><div>{product.sizeOptions.map((option, index) => <button key={`${option.label}-${index}`} className={size === option.label ? "selected" : ""} onClick={() => setSize(option.label)}>{option.label}</button>)}</div></div>}
           {product.remoteEnabled && <div className="product-choice"><b>Kumanda <small>{remote}</small></b><div>{["Kumandalı", "Kumandasız"].map((option) => <button key={option} className={remote === option ? "selected" : ""} onClick={() => setRemote(option)}>{option}</button>)}</div><small className="remote-price-note">Kumandalı seçeneği: +₺{Number(product.remoteExtra || 0).toLocaleString("tr-TR")}</small></div>}
-          <div className="product-actions"><div className="quantity"><button onClick={() => setQuantity((value) => Math.max(1, value - 1))}>-</button><b>{quantity}</b><button onClick={() => setQuantity((value) => value + 1)}>+</button></div><a className="product-add" href={orderUrl} target="_blank" rel="noopener noreferrer">WHATSAPP&apos;TAN SATIN AL</a></div>
+          <div className="product-actions">
+  <div className="quantity">
+    <button onClick={() => setQuantity((value) => Math.max(1, value - 1))}>-</button>
+    <b>{quantity}</b>
+    <button onClick={() => setQuantity((value) => value + 1)}>+</button>
+  </div>
+  <button type="button" className="product-add" onClick={handleAddToCart}>
+    SEPETE EKLE +
+  </button>
+</div>
         </div>
       </section>
       <section className="product-description product-description-specs-only"><div className="product-specs"><h3>Teknik özellikler</h3><dl>{specs.map((item) => <div key={item.heading}><dt>{item.heading}</dt><dd>{item.detail}</dd></div>)}</dl></div></section>
