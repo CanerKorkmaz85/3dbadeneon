@@ -9,12 +9,29 @@ export const productCategories = [
   "Etkinlik & Organizasyon",
   "Ev Dekorasyon",
   "Ek Malzemeler",
+  "3D Maket",
+  "Tabela",
+  "Paslanmaz",
+  "Kutu Harf",
 ] as const;
+
+export const productTypes = ["Neon", "3D Maket", "Kutu Harf", "Paslanmaz"] as const;
+
+export type ProductType = (typeof productTypes)[number];
+
+export type ProductSizeOption = {
+  label: string;
+  price: string;
+};
 
 export type AdminProduct = {
   id: string;
   title: string;
   category: string;
+  productType: ProductType;
+  sizesEnabled: boolean;
+  sizeOptions: ProductSizeOption[];
+  remoteEnabled: boolean;
   price30: string;
   price40: string;
   price50: string;
@@ -26,7 +43,8 @@ export type AdminProduct = {
   hoverImages: string[];
 };
 
-export const technicalTemplate = `Ölçü
+export const technicalTemplates: Record<ProductType, string> = {
+  Neon: `Ölçü
 30, 40, 50 cm veya özel ölçü
 
 Malzeme
@@ -39,7 +57,71 @@ Kablo
 Yaklaşık 2 metre
 
 Paket içeriği
-Neon dekor ve 12V adaptör`;
+Neon dekor ve 12V adaptör`,
+  "3D Maket": `Üretim
+Katmanlı 3D baskı
+
+Malzeme
+PLA, PETG veya projeye uygun filament
+
+Renk
+Projeye göre tek veya çok renkli üretim
+
+Detay
+Modelin yapısına uygun baskı hassasiyeti
+
+Teslimat
+Kontrol edilmiş ve güvenli paketlenmiş ürün`,
+  "Kutu Harf": `Gövde
+Projeye uygun pleksi, alüminyum veya paslanmaz gövde
+
+Ön yüz
+Pleksi veya metal yüzey seçeneği
+
+Aydınlatma
+LED'li veya ışıksız üretim
+
+Montaj
+Uygulama alanına uygun montaj sistemi
+
+Kullanım
+İç veya dış mekâna uygun üretim`,
+  Paslanmaz: `Malzeme
+Paslanmaz çelik
+
+Yüzey
+Ayna, satine veya projeye özel yüzey
+
+Uygulama
+Kesim, büküm ve kaynak işlemleri
+
+Montaj
+Projeye uygun montaj sistemi
+
+Kullanım
+İç veya dış mekâna uygun üretim`,
+};
+
+export const technicalTemplate = technicalTemplates.Neon;
+
+export function defaultSizeOptions(productType: ProductType): ProductSizeOption[] {
+  if (productType === "3D Maket") {
+    return [
+      { label: "10 cm", price: "" },
+      { label: "12 cm", price: "" },
+      { label: "23 cm", price: "" },
+    ];
+  }
+  if (productType === "Neon") {
+    return [
+      { label: "30 cm", price: "" },
+      { label: "40 cm", price: "" },
+      { label: "50 cm", price: "" },
+      { label: "Özel ölçü", price: "Teklif Al" },
+    ];
+  }
+  return [];
+}
 
 export const adminProductsKey = "3dbade-admin-products-v1";
 
@@ -126,6 +208,15 @@ export const defaultProducts: AdminProduct[] = productNames.map(
     id,
     title,
     category,
+    productType: "Neon",
+    sizesEnabled: true,
+    sizeOptions: [
+      { label: "30 cm", price: id === "eriyen-dondurma-neon" ? "3400" : "4100" },
+      { label: "40 cm", price: "4100" },
+      { label: "50 cm", price: id === "eriyen-dondurma-neon" ? "4900" : "4100" },
+      { label: "Özel ölçü", price: "Teklif Al" },
+    ],
+    remoteEnabled: true,
     price30: id === "eriyen-dondurma-neon" ? "3400" : "4100",
     price40: "4100",
     price50: id === "eriyen-dondurma-neon" ? "4900" : "4100",
@@ -143,6 +234,10 @@ export function createEmptyProduct(): AdminProduct {
     id: "",
     title: "",
     category: productCategories[0],
+    productType: "Neon",
+    sizesEnabled: true,
+    sizeOptions: defaultSizeOptions("Neon"),
+    remoteEnabled: true,
     price30: "",
     price40: "",
     price50: "",
@@ -155,26 +250,64 @@ export function createEmptyProduct(): AdminProduct {
   };
 }
 
+function inferredProductType(product: Partial<AdminProduct>): ProductType {
+  if (product.productType && productTypes.includes(product.productType)) return product.productType;
+  if (product.category === "3D Maket") return "3D Maket";
+  if (product.category === "Paslanmaz") return "Paslanmaz";
+  if (product.category === "Kutu Harf") return "Kutu Harf";
+  return "Neon";
+}
+
+export function normalizeAdminProduct(product: Partial<AdminProduct>): AdminProduct {
+  const productType = inferredProductType(product);
+  const fallback = defaultProducts.find((item) => item.id === product.id);
+  const legacySizes: ProductSizeOption[] = [
+    { label: "30 cm", price: String(product.price30 || fallback?.price30 || "") },
+    { label: "40 cm", price: String(product.price40 || fallback?.price40 || "") },
+    { label: "50 cm", price: String(product.price50 || fallback?.price50 || "") },
+    { label: "Özel ölçü", price: String(product.specialPrice || fallback?.specialPrice || "Teklif Al") },
+  ];
+  const suppliedSizes = Array.isArray(product.sizeOptions)
+    ? product.sizeOptions
+        .map((option) => ({ label: String(option?.label || ""), price: String(option?.price || "") }))
+        .filter((option) => option.label.trim())
+    : [];
+  const sizeOptions = suppliedSizes.length
+    ? suppliedSizes
+    : productType === "Neon"
+      ? legacySizes
+      : defaultSizeOptions(productType);
+
+  return {
+    ...createEmptyProduct(),
+    ...fallback,
+    ...product,
+    id: String(product.id || ""),
+    title: String(product.title || fallback?.title || ""),
+    category: String(product.category || fallback?.category || productCategories[0]),
+    productType,
+    sizesEnabled: typeof product.sizesEnabled === "boolean"
+      ? product.sizesEnabled
+      : productType === "Neon" || productType === "3D Maket",
+    sizeOptions,
+    remoteEnabled: typeof product.remoteEnabled === "boolean"
+      ? product.remoteEnabled
+      : productType === "Neon",
+    description: String(product.description || fallback?.description || ""),
+    technical: String(product.technical || fallback?.technical || technicalTemplates[productType]),
+    mainImage: String(product.mainImage || fallback?.mainImage || ""),
+    hoverImages: Array.isArray(product.hoverImages) && product.hoverImages.length
+      ? product.hoverImages.map(String)
+      : fallback?.hoverImages || [],
+  };
+}
+
 export function readAdminProducts(): AdminProduct[] {
   if (typeof window === "undefined") return defaultProducts;
   try {
     const saved = JSON.parse(window.localStorage.getItem(adminProductsKey) || "[]");
     if (!Array.isArray(saved) || saved.length === 0) return defaultProducts;
-    return saved.map((product) => {
-      const fallback = defaultProducts.find((item) => item.id === product.id);
-      return {
-        ...createEmptyProduct(),
-        ...fallback,
-        ...product,
-        description: product.description || fallback?.description || "",
-        mainImage: product.mainImage || fallback?.mainImage || "",
-        hoverImages:
-          Array.isArray(product.hoverImages) && product.hoverImages.length
-            ? product.hoverImages
-            : fallback?.hoverImages || [],
-        id: String(product.id || ""),
-      };
-    });
+    return saved.map((product) => normalizeAdminProduct(product));
   } catch {
     return defaultProducts;
   }

@@ -4,12 +4,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { originalPriceForDiscount } from "../../../lib/pricing";
 import FormattedProductCopy from "../../../components/FormattedProductCopy";
+import { defaultSizeOptions, technicalTemplates, type ProductSizeOption, type ProductType } from "../../../lib/admin-products";
 
 type ProductPreview = {
   title: string;
   category: string;
+  productType: ProductType;
+  sizesEnabled: boolean;
+  sizeOptions: ProductSizeOption[];
+  remoteEnabled: boolean;
   price30: string;
   price40: string;
   price50: string;
@@ -24,13 +28,17 @@ type ProductPreview = {
 const empty: ProductPreview = {
   title: "Ürün adı",
   category: "Kategorisi",
+  productType: "Neon",
+  sizesEnabled: true,
+  sizeOptions: defaultSizeOptions("Neon"),
+  remoteEnabled: true,
   price30: "",
   price40: "",
   price50: "",
   specialPrice: "Teklif al",
   remoteExtra: "250",
   description: "Ürün açıklaması henüz girilmedi.",
-  technical: "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
+  technical: technicalTemplates.Neon,
   mainPreview: "",
 };
 
@@ -41,7 +49,19 @@ export default function ProductPreviewPage() {
       const saved =
         window.sessionStorage.getItem("3dbade-product-preview") ||
         window.localStorage.getItem("3dbade-product-preview");
-      return saved ? { ...empty, ...JSON.parse(saved) } : empty;
+      if (!saved) return empty;
+      const parsed = { ...empty, ...JSON.parse(saved) } as ProductPreview;
+      return {
+        ...parsed,
+        sizeOptions: Array.isArray(parsed.sizeOptions) && parsed.sizeOptions.length
+          ? parsed.sizeOptions
+          : [
+              { label: "30 cm", price: parsed.price30 },
+              { label: "40 cm", price: parsed.price40 },
+              { label: "50 cm", price: parsed.price50 },
+              { label: "Özel ölçü", price: parsed.specialPrice },
+            ],
+      };
     } catch {
       return empty;
     }
@@ -49,28 +69,19 @@ export default function ProductPreviewPage() {
 
   const images = [product.mainPreview, ...(product.hoverPreviews || [])].filter(Boolean);
   const [imageIndex, setImageIndex] = useState(0);
-  const [size, setSize] = useState("30 cm");
+  const [size, setSize] = useState(product.sizeOptions[0]?.label || "");
   const [remote, setRemote] = useState("Kumandalı");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  const prices: Record<string, string> = {
-    "30 cm": product.price30,
-    "40 cm": product.price40,
-    "50 cm": product.price50,
-    Özel: product.specialPrice,
-  };
-
-  const basePrice = Number(prices[size]);
+  const selectedSize = product.sizeOptions.find((option) => option.label === size);
+  const basePrice = Number(product.sizesEnabled ? selectedSize?.price : product.specialPrice);
   const shownPrice =
-    size === "Özel" || !basePrice
+    !basePrice
       ? null
       : (basePrice +
-          (remote === "Kumandalı" ? Number(product.remoteExtra || 0) : 0)) *
+          (product.remoteEnabled && remote === "Kumandalı" ? Number(product.remoteExtra || 0) : 0)) *
         quantity;
-  const originalShownPrice = shownPrice
-    ? originalPriceForDiscount(shownPrice)
-    : null;
 
   const technicalSpecs = (product.technical || "")
     .split("\n\n")
@@ -99,7 +110,6 @@ export default function ProductPreviewPage() {
           </div>
           <div className="product-image">
             {images[imageIndex] ? <img src={images[imageIndex]} alt={product.title} /> : <span>Görsel seçilmedi</span>}
-            <em className="discount-badge">-%20</em>
           </div>
         </div>
 
@@ -108,21 +118,20 @@ export default function ProductPreviewPage() {
           <h1>{product.title}</h1>
           <div className="product-stars"><span>★★★★★</span><small>Yeni ürün · 3Dbade özel seri</small></div>
           <div className="product-price">
-            {originalShownPrice ? <del>₺{originalShownPrice.toLocaleString("tr-TR")}</del> : null}
             <strong>{shownPrice ? `₺${shownPrice.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong>
-            <small>{size === "Özel" ? "Özel ölçü için sana özel teklif hazırlanır" : "KDV dahil · Ücretsiz kargo"}</small>
+            <small>{!basePrice ? "Bu ürün için sana özel teklif hazırlanır" : "KDV dahil · Ücretsiz kargo"}</small>
           </div>
 
-          <div className="product-choice">
+          {product.sizesEnabled && product.sizeOptions.length > 0 && <div className="product-choice">
             <b>Boyut <small>{size}</small></b>
-            <div>{["30 cm", "40 cm", "50 cm", "Özel"].map((option) => <button key={option} className={size === option ? "selected" : ""} onClick={() => setSize(option)}>{option}</button>)}</div>
-          </div>
+            <div>{product.sizeOptions.map((option, index) => <button key={`${option.label}-${index}`} className={size === option.label ? "selected" : ""} onClick={() => setSize(option.label)}>{option.label}</button>)}</div>
+          </div>}
 
-          <div className="product-choice">
+          {product.remoteEnabled && <div className="product-choice">
             <b>Kumanda <small>{remote}</small></b>
             <div>{["Kumandalı", "Kumandasız"].map((option) => <button key={option} className={remote === option ? "selected" : ""} onClick={() => setRemote(option)}>{option}</button>)}</div>
             <small className="remote-price-note">Kumandalı seçeneği: +₺{Number(product.remoteExtra || 0).toLocaleString("tr-TR")}</small>
-          </div>
+          </div>}
 
           <div className="product-actions">
             <div className="quantity">

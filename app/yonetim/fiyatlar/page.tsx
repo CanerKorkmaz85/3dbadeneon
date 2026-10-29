@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
-  defaultProducts,
+  normalizeAdminProduct,
   readAdminProducts,
   type AdminProduct,
   writeAdminProducts,
@@ -17,12 +17,11 @@ type PriceRow = {
   cm50: number;
   remoteExtra: number;
   special: string;
+  sizesEnabled: boolean;
+  remoteEnabled: boolean;
 };
-
-const editorUrl = "http://127.0.0.1:3002";
-
-function productsToRows(products: AdminProduct[]): PriceRow[] {
-  return products.map((product) => ({
+function readRows(): PriceRow[] {
+  return readAdminProducts().map(normalizeAdminProduct).map((product) => ({
     id: product.id,
     product: product.title,
     cm30: Number(product.price30) || 0,
@@ -30,42 +29,19 @@ function productsToRows(products: AdminProduct[]): PriceRow[] {
     cm50: Number(product.price50) || 0,
     remoteExtra: Number(product.remoteExtra) || 0,
     special: product.specialPrice,
+    sizesEnabled: product.sizesEnabled,
+    remoteEnabled: product.remoteEnabled,
   }));
 }
 
-function readRows(): PriceRow[] {
-  return productsToRows(readAdminProducts());
-}
-
 export default function PriceManagementPage() {
-  const [rows, setRows] = useState<PriceRow[]>(() => productsToRows(defaultProducts));
+  const [rows, setRows] = useState<PriceRow[]>(readRows);
   const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
   useEffect(() => {
     const refresh = () => setRows(readRows());
-    const cachedRowsTimer = window.setTimeout(refresh, 0);
-
-    async function loadFromComputer() {
-      try {
-        const response = await fetch(`${editorUrl}/products?t=${Date.now()}`, {
-          cache: "no-store",
-        });
-        const result = await response.json();
-        if (response.ok && Array.isArray(result.products) && result.products.length) {
-          writeAdminProducts(result.products);
-          setRows(productsToRows(result.products));
-        }
-      } catch {
-        setError("Bilgisayardaki fiyat dosyası okunamadı. 3Dbade Editor penceresinin açık olduğunu kontrol edin.");
-      }
-    }
-
-    loadFromComputer();
     window.addEventListener("storage", refresh);
     window.addEventListener("3dbade-products-updated", refresh);
     return () => {
-      window.clearTimeout(cachedRowsTimer);
       window.removeEventListener("storage", refresh);
       window.removeEventListener("3dbade-products-updated", refresh);
     };
@@ -78,8 +54,7 @@ export default function PriceManagementPage() {
     setRows((current) =>
       current.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
     );
-  async function savePrices() {
-    if (saving) return;
+  function savePrices() {
     const byId = new Map(rows.map((row) => [row.id, row]));
     const next: AdminProduct[] = readAdminProducts().map((product) => {
       const row = byId.get(product.id);
@@ -90,32 +65,19 @@ export default function PriceManagementPage() {
         price30: String(row.cm30),
         price40: String(row.cm40),
         price50: String(row.cm50),
-        remoteExtra: String(row.remoteExtra),
+        remoteExtra: row.remoteEnabled ? String(row.remoteExtra) : "",
         specialPrice: row.special,
+        sizeOptions: product.sizeOptions.map((option) => {
+          if (option.label === "30 cm") return { ...option, price: String(row.cm30) };
+          if (option.label === "40 cm") return { ...option, price: String(row.cm40) };
+          if (option.label === "50 cm") return { ...option, price: String(row.cm50) };
+          return option;
+        }),
       };
     });
-
-    setSaving(true);
-    setSaved(false);
-    setError("");
-    try {
-      const response = await fetch(`${editorUrl}/save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ products: next }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Fiyatlar kaydedilemedi.");
-      const savedProducts = result.products as AdminProduct[];
-      writeAdminProducts(savedProducts);
-      setRows(productsToRows(savedProducts));
-      setSaved(true);
-      window.setTimeout(() => setSaved(false), 3000);
-    } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : "Fiyatlar kaydedilemedi.");
-    } finally {
-      setSaving(false);
-    }
+    writeAdminProducts(next);
+    setSaved(true);
+    window.setTimeout(() => setSaved(false), 2200);
   }
 
   return (
@@ -158,6 +120,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm30}
                       onChange={(event) =>
                         updateRow(row.id, "cm30", Number(event.target.value))
@@ -168,6 +131,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm40}
                       onChange={(event) =>
                         updateRow(row.id, "cm40", Number(event.target.value))
@@ -178,6 +142,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.sizesEnabled}
                       value={row.cm50}
                       onChange={(event) =>
                         updateRow(row.id, "cm50", Number(event.target.value))
@@ -188,6 +153,7 @@ export default function PriceManagementPage() {
                     <input
                       type="number"
                       min="0"
+                      disabled={!row.remoteEnabled}
                       value={row.remoteExtra}
                       onChange={(event) =>
                         updateRow(
@@ -212,18 +178,17 @@ export default function PriceManagementPage() {
           </table>
         </div>
         <div className="compact-price-footer">
-          <button className="price-save" onClick={savePrices} disabled={saving}>
-            {saving ? "KAYDEDİLİYOR..." : "KAYDET"}
+          <button className="price-save" onClick={savePrices}>
+            KAYDET
           </button>
           {saved && (
             <strong className="price-saved">
-              Bilgisayara kaydedildi. Fiyatlar artık kapanınca kaybolmaz.
+              Kaydedildi. Ürün yönetiminde de güncel fiyatlar görünür.
             </strong>
           )}
-          {error && <strong className="price-save-error">{error}</strong>}
           <small>
-            Fiyatlar TL olarak girilir. Kumanda sütunundaki rakam, seçildiğinde
-            ölçü fiyatına eklenir.
+            30/40/50 cm dışındaki özel ölçüler, ölçüyü kapatma ve kumanda ayarı
+            ÜRÜN GİRİŞİ sayfasından yönetilir.
           </small>
         </div>
       </section>
