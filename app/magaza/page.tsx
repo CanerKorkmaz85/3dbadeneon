@@ -17,10 +17,6 @@ const categories = [
   "Spor Salonu",
   "Takımlar",
   "Ek Malzemeler",
-  "3D Maket",
-  "Tabela",
-  "Paslanmaz",
-  "Kutu Harf",
 ];
 
 function matchesCategory(product: Pick<AdminProduct, "id" | "title" | "category">, category: string) {
@@ -92,10 +88,10 @@ export default function MagazaPage() {
       <section className="all-products-section">
         <div className="all-products-heading"><span>Kategoriyi seç; ürünleri kolayca incele.</span></div>
         <div className="shop-category-bar">
-          <button className={selectedCategory === "Tümü" ? "selected" : ""} onClick={() => setSelectedCategory("Tümü")}>Tümü</button>
           {categories.map((category) => (
             <button key={category} className={selectedCategory === category ? "selected" : ""} onClick={() => setSelectedCategory(category)}>{category}</button>
           ))}
+          <button style={{ background: "#000", color: "#fff", borderColor: "#000" }} className={selectedCategory === "Tümü" ? "selected" : ""} onClick={() => setSelectedCategory("Tümü")}>Tümü</button>
         </div>
         <div className="all-product-status"><span>{selectedCategory === "Tümü" ? "Tüm ürünler" : selectedCategory}</span><b>{visibleProducts.length} ürün</b></div>
         {visibleProducts.length ? (
@@ -114,6 +110,7 @@ export default function MagazaPage() {
                 </div>
               </article>
             ))}
+
           </div>
         ) : (
           <div className="empty-category"><b>{selectedCategory}</b><span>Bu kategoriye ait ürünleri yakında ekleyeceğiz.</span><button onClick={() => setSelectedCategory("Tümü")}>TÜM ÜRÜNLERİ GÖR</button></div>
