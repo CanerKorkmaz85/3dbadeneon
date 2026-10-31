@@ -217,26 +217,29 @@ const popArtCollection = [
 ];
 const threeDPrintingCards = [
   {
-    src: "/uploads/kardan-adam-fig-r-1792705094255/ana-1792705094289-n2lp9h.jpg",
-    hoverSrc:
-      "/uploads/kardan-adam-fig-r-1792705094255/galeri-1-1792705094293-6dsowj.jpg",
-    alt: "3D baskı kardan adam figürü",
-    title: "Kardan Adam Figürü",
+    "src": "/uploads/kardan-adam-fig-r-1792705094255/ana-1792705094289-n2lp9h.jpg",
+    "hoverSrc": "/uploads/kardan-adam-fig-r-1792705094255/galeri-1-1792705094293-6dsowj.jpg",
+    "alt": "Kardan Adam",
+    "title": "Kardan Adam"
   },
   {
-    src: "/uploads/noel-baba-fig-r-1792705971665/ana-1792705971679-vc0nr0.jpg",
-    hoverSrc:
-      "/uploads/noel-baba-fig-r-1792705971665/galeri-1-1792705971681-xd2059.jpg",
-    alt: "3D baskı Noel Baba figürü",
-    title: "Noel Baba Figürü",
+    "src": "/uploads/noel-baba-fig-r-1792705971665/ana-1792705971679-vc0nr0.jpg",
+    "hoverSrc": "/uploads/noel-baba-fig-r-1792705971665/galeri-1-1792705971681-xd2059.jpg",
+    "alt": "Noel Baba",
+    "title": "Noel Baba"
   },
   {
-    src: "/uploads/kardan-adam-fig-r-1792705094255/galeri-2-1792705094294-706ccv.jpg",
-    hoverSrc:
-      "/uploads/kardan-adam-fig-r-1792705094255/galeri-3-1792705094296-l988nz.jpg",
-    alt: "Özel ölçü 3D baskı dekoratif figür",
-    title: "Özel Ölçü Figürler",
+    "src": "/uploads/t-rk-bayra-i-ve-atat-rk-ift-tarafli-dekoratif-flama-1793256129072/ana-1793256129126-bka4xw.jpg",
+    "hoverSrc": "/uploads/t-rk-bayra-i-ve-atat-rk-ift-tarafli-dekoratif-flama-1793256129072/galeri-1-1793256129132-jv1r1z.jpg",
+    "alt": "Türk Bayrağı ve Atatürk Çift Taraflı Dekoratif Flama",
+    "title": "Türk Bayrağı ve Atatürk Çift Taraflı Dekoratif Flama"
   },
+  {
+    "src": "/uploads/ki-iye-zel-kadin-doktor-kalemlik-1793218911697/ana-1793218911715-c7cpkm.jpg",
+    "hoverSrc": "/uploads/ki-iye-zel-kadin-doktor-kalemlik-1793218911697/galeri-1-1793218911718-zl22i3.jpg",
+    "alt": "Kişiye Özel Doktor Kalemlik",
+    "title": "Kişiye Özel Doktor Kalemlik"
+  }
 ];
 
 const signageCards = [

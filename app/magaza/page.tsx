@@ -72,7 +72,7 @@ export default function MagazaPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const catalogProducts = products.map((product) => ({
+  const catalogProducts = products.filter((product) => product.productType === "Neon").map((product) => ({
     ...product,
     image: product.mainImage || "/products/catalog/comic-ouch.jpg",
     hoverImage: product.hoverImages?.[0] || "",

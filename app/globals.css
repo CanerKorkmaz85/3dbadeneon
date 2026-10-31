@@ -5550,3 +5550,25 @@ a {
     margin: 14px 0 0;
   }
 }
+
+.checkout-page .whatsapp-order {
+  position: static;
+  display: inline-flex;
+  background: #1c9b56;
+  color: #fff;
+}
+
+/* home-3d-four-products */
+.home-3d-section .venue-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.home-3d-section .venue-card {
+  aspect-ratio: 3/4;
+}
+@media (max-width: 780px) {
+  .home-3d-section .venue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
