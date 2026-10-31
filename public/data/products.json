@@ -1035,7 +1035,6 @@
     ]
   },
   {
-    "id": "noel-baba-fig-r-1792705971665",
     "title": "Noel Baba Figürü 🎅✨",
     "category": "3D Maket",
     "productType": "3D Maket",
@@ -1043,7 +1042,7 @@
     "sizeOptions": [
       {
         "label": "12,5 cm",
-        "price": "370"
+        "price": "550"
       }
     ],
     "remoteEnabled": false,
@@ -1059,7 +1058,8 @@
       "/uploads/noel-baba-fig-r-1792705971665/galeri-1-1792705971681-xd2059.jpg",
       "/uploads/noel-baba-fig-r-1792705971665/galeri-2-1792705971682-ojtc0q.jpg",
       "/uploads/noel-baba-fig-r-1792705971665/galeri-3-1792705971687-8kwlfn.jpg"
-    ]
+    ],
+    "id": "noel-baba-fig-r-1792705971665"
   },
   {
     "id": "paslanmaz-kutu-harf-1792708995313",
