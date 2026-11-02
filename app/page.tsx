@@ -215,6 +215,49 @@ const popArtCollection = [
     title: "Tropikal Kuru Kafa Neon",
   },
 ];
+const extraNeonCollection = [
+  {
+    "title": "Waffle Neon LED Duvar Dekoru",
+    "src": "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/ana-1793433559774-8ppmkj.jpg",
+    "href": "/urunler/waffle-neon-led-duvar-dekoru-1793433559756"
+  },
+  {
+    "title": "Çilekli Astronot Neon LED",
+    "src": "/urun-gorselleri/astronot/cilekli/ana.jpg",
+    "href": "/urunler/cilekli-astronot"
+  },
+  {
+    "title": "Astronot Ay Neon LED",
+    "src": "/urun-gorselleri/astronot/ay/ana.jpg",
+    "href": "/urunler/astronot-ay"
+  },
+  {
+    "title": "Astronot Savaşçı Neon LED",
+    "src": "/urun-gorselleri/astronot/savasci/ana.jpg",
+    "href": "/urunler/astronot-savasci"
+  },
+  {
+    "title": "Köpek Patron Neon LED",
+    "src": "/urun-gorselleri/pop-art/kopek-patron/ana.jpg",
+    "href": "/urunler/kopek-patron"
+  },
+  {
+    "title": "Dolar Kesesi Neon LED",
+    "src": "/urun-gorselleri/pop-art/dolar-kesesi/ana.jpg",
+    "href": "/urunler/dolar-kesesi"
+  },
+  {
+    "title": "Gamer Oyun Kolu Neon",
+    "src": "/urun-gorselleri/gamer/oyun-kolu/ana.jfif",
+    "href": "/urunler/gamer-oyun-kolu"
+  },
+  {
+    "title": "Smaç Basan Astronot Neon LED",
+    "src": "/urun-gorselleri/astronot/smac/ana.jpg",
+    "href": "/urunler/smac-astronot"
+  }
+];
+
 const threeDPrintingCards = [
   {
     "src": "/uploads/kardan-adam-fig-r-1792705094255/ana-1792705094289-n2lp9h.jpg",
@@ -863,8 +906,13 @@ export default function Home() {
         </div>
       </section>
       <section id="koleksiyonlar" className="collection-section">
+        
         <div className="visual-collection">
-          <h2>Takımlar</h2>
+<div className="venue-title-row">
+  <div><h2>Takımlar</h2></div>
+  <a href="/magaza">TÜM NEONLARI İNCELE →</a>
+</div>
+          
           <div className="four-visual-grid">
             {teamCollection.map((item) => (
               <article className="collection-item" key={item.src}>
@@ -892,8 +940,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className="visual-collection">
-          <h2>Pop-art</h2>
+        <div className="visual-collection" style={{ marginTop: "48px" }}>
           <div className="four-visual-grid">
             {popArtCollection.map((item) => (
               <article className="collection-item" key={item.src}>
@@ -905,6 +952,19 @@ export default function Home() {
                     height={1200}
                   />
                 </a>
+                <span className="collection-visual-title">{item.title}</span>
+              </article>
+            ))}
+          </div>
+        </div>
+      
+        <div className="visual-collection">
+          <div className="four-visual-grid">
+            {extraNeonCollection.map((item) => (
+              <article className="collection-item" key={item.href}>
+                <Link href={item.href} className="collection-visual">
+                  <Image src={item.src} alt={item.title} width={900} height={1200} />
+                </Link>
                 <span className="collection-visual-title">{item.title}</span>
               </article>
             ))}
