@@ -88,6 +88,7 @@ export default function MagazaPage() {
       <section className="all-products-section">
         <div className="all-products-heading"><span>Kategoriyi seç; ürünleri kolayca incele.</span></div>
         <div className="shop-category-bar">
+          <Link href="/tasarla" style={{ background: "#087ed5", color: "#ff8a16", border: "1px solid #087ed5", borderRadius: 999, padding: "10px 14px", fontSize: 11, fontWeight: 800, textDecoration: "none", whiteSpace: "nowrap" }}>Kendin Tasarla</Link>
           {categories.map((category) => (
             <button key={category} className={selectedCategory === category ? "selected" : ""} onClick={() => setSelectedCategory(category)}>{category}</button>
           ))}

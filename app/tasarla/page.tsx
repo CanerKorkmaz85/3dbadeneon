@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { addToCart } from "../../lib/cart";
 
 const fonts = [
   "Junkyard",
@@ -57,7 +58,46 @@ export default function TasarlaPage() {
   const [notes, setNotes] = useState("");
   const [logoName, setLogoName] = useState("");
   const [logoPreview, setLogoPreview] = useState("");
-  const [, setCartCount] = useState(0);
+  const [cartNotice, setCartNotice] = useState("");
+
+  function saveDesignToCart() {
+    if (mode === "text" && !text.trim()) {
+      setCartNotice("Lütfen tasarım yazısını gir.");
+      return;
+    }
+    if (mode === "logo" && !logoPreview) {
+      setCartNotice("Lütfen logo görselini seç.");
+      return;
+    }
+
+    const colorName = colors.find((item) => item.value === color)?.name || color;
+    const details = [
+      `Yükseklik: ${height}`,
+      ...(mode === "text" ? [`Yazı tipi: ${font}`, `Hizalama: ${align}`, `Renk: ${colorName}`] : [`Logo dosyası: ${logoName}`]),
+      `Pleksi kesim: ${cut}`,
+      `Plaka rengi: ${plateColor}`,
+      `Kullanım: ${usage}`,
+      `Trafo: ${transformer}`,
+      ...(notes.trim() ? [`Not: ${notes.trim()}`] : []),
+    ].join(" | ");
+
+    try {
+      addToCart({
+        id: `ozel-tasarim-${crypto.randomUUID()}`,
+        title: mode === "text" ? `Özel Neon Tasarım: ${text.trim()}` : `Özel Logo Tasarımı: ${logoName}`,
+        image: "",
+        size: details,
+        remote: "",
+        quantity: 1,
+        unitPrice: null,
+      });
+      setCartNotice(mode === "logo"
+        ? "Tasarım sepete eklendi. Logo dosyasını sipariş sırasında WhatsApp üzerinden ayrıca gönder."
+        : "Tasarım sepete eklendi.");
+    } catch {
+      setCartNotice("Tasarım kaydedilemedi. Tekrar dene.");
+    }
+  }
   const selectedIsRgb = color.includes("gradient");
   const preview = mode === "text" ? text || "3DbadeNeon" : "Logon";
   const fitSize = `${Math.max(42, Math.min(120, 560 / Math.max(preview.replace(/\n/g, "").length, 1)))}px`;
@@ -299,10 +339,16 @@ export default function TasarlaPage() {
             </div>
             <button
               className="designer-add"
-              onClick={() => setCartCount((count) => count + 1)}
+              onClick={saveDesignToCart}
             >
               TASARIMI SEPETE EKLE +
             </button>
+            <p role="status" aria-live="polite">{cartNotice}</p>
+            {cartNotice.startsWith("Tasarım sepete eklendi") && (
+              <a href="/odeme" style={{ display: "inline-block", padding: "12px 0", color: "#087ed5", fontWeight: 700 }}>
+                Sepete git →
+              </a>
+            )}
           </div>
         </div>
       </section>

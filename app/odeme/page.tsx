@@ -10,6 +10,27 @@ const emptyGuest: GuestAddress = { name: "", surname: "", email: "", phone: "+90
 export default function CheckoutPage() {
   const [payment, setPayment] = useState("whatsapp");
   const [guest, setGuest] = useState(emptyGuest);
+  const [savedAddresses, setSavedAddresses] = useState<GuestAddress[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
+
+  useEffect(() => {
+    try {
+      const profile = JSON.parse(sessionStorage.getItem("3dbade-account-session") || "null");
+      if (!profile) return;
+      const stored = JSON.parse(localStorage.getItem("3dbade-addresses") || "[]");
+      if (!Array.isArray(stored)) return;
+      setSavedAddresses(stored.filter((item) => item && typeof item.address === "string").map((item) => ({
+        name: item.name || "",
+        surname: item.surname || "",
+        email: profile.email || "",
+        phone: item.phone || "",
+        address: [item.company, item.address].filter(Boolean).join(", "),
+        detail: item.detail || "",
+        city: item.city || "",
+        zip: item.zip || "",
+      })));
+    } catch {}
+  }, []);
   const [items, setItems] = useState<CartItem[]>([]);
 
 useEffect(() => {
@@ -66,7 +87,29 @@ Stok ve ödeme bilgilerini rica ederim.`;
     <section className="checkout-heading"><p>GÜVENLİ ÖDEME</p><h1>Siparişini tamamla.</h1><span>Hesap açmadan da teslimat bilgilerini girip WhatsApp&apos;tan sipariş verebilirsin.</span></section>
     <section className="checkout-layout">
       <div className="checkout-form">
-        <div className="checkout-step"><b>1</b><div><h2>Teslimat bilgileri</h2><p>Misafir olarak devam edebilirsin. Bu bilgiler sadece sipariş talebinle birlikte WhatsApp mesajına eklenir.</p><div className="guest-address-form"><div className="two-fields"><label>Ad<input required value={guest.name} onChange={(e) => update("name", e.target.value)} /></label><label>Soyad<input required value={guest.surname} onChange={(e) => update("surname", e.target.value)} /></label></div><div className="two-fields"><label>E-posta<input type="email" required value={guest.email} onChange={(e) => update("email", e.target.value)} /></label><label>Telefon<input required value={guest.phone} onChange={(e) => update("phone", e.target.value)} /></label></div><label>Adres<input required value={guest.address} onChange={(e) => update("address", e.target.value)} /></label><label>Apartman, daire vb. (isteğe bağlı)<input value={guest.detail} onChange={(e) => update("detail", e.target.value)} /></label><div className="two-fields"><label>Şehir<input required value={guest.city} onChange={(e) => update("city", e.target.value)} /></label><label>Posta kodu<input value={guest.zip} onChange={(e) => update("zip", e.target.value)} /></label></div></div><Link className="account-address-link" href="/hesabim">HESABIN VARSA ADRESLERİNDEN SEÇ</Link></div></div>
+        <div className="checkout-step"><b>1</b><div><h2>Teslimat bilgileri</h2><p>Misafir olarak devam edebilirsin. Bu bilgiler sadece sipariş talebinle birlikte WhatsApp mesajına eklenir.</p>{savedAddresses.length > 0 && (
+  <label style={{ display: "grid", gap: 8, margin: "16px 0" }}>
+    Kayıtlı adreslerinden seç
+    <select
+      value={selectedAddress}
+      onChange={(event) => {
+        const value = event.target.value;
+        setSelectedAddress(value);
+        if (value !== "") setGuest({ ...savedAddresses[Number(value)] });
+        else setGuest({ ...emptyGuest });
+      }}
+      style={{ padding: 12, width: "100%", border: "1px solid #ccc", borderRadius: 8, background: "#fff", color: "#222" }}
+    >
+      <option value="">Yeni adres gir</option>
+      {savedAddresses.map((item, index) => (
+        <option key={index} value={String(index)}>
+          {item.name} {item.surname} — {item.address}, {item.city}
+        </option>
+      ))}
+    </select>
+  </label>
+)}
+<div className="guest-address-form"><div className="two-fields"><label>Ad<input required value={guest.name} onChange={(e) => update("name", e.target.value)} /></label><label>Soyad<input required value={guest.surname} onChange={(e) => update("surname", e.target.value)} /></label></div><div className="two-fields"><label>E-posta<input type="email" required value={guest.email} onChange={(e) => update("email", e.target.value)} /></label><label>Telefon<input required value={guest.phone} onChange={(e) => update("phone", e.target.value)} /></label></div><label>Adres<input required value={guest.address} onChange={(e) => update("address", e.target.value)} /></label><label>Apartman, daire vb. (isteğe bağlı)<input value={guest.detail} onChange={(e) => update("detail", e.target.value)} /></label><div className="two-fields"><label>Şehir<input required value={guest.city} onChange={(e) => update("city", e.target.value)} /></label><label>Posta kodu<input value={guest.zip} onChange={(e) => update("zip", e.target.value)} /></label></div></div><Link className="account-address-link" href="/hesabim">ADRES EKLE / HESABIMA GİT</Link></div></div>
         <div className="checkout-step"><b>2</b><div><h2>Ödeme yöntemi</h2><label className="payment-option payment-disabled"><input type="radio" name="payment" disabled /> Kredi veya banka kartı ile güvenli ödeme <small>Yakında</small></label><label className={payment === "whatsapp" ? "payment-option selected" : "payment-option"}><input type="radio" name="payment" checked={payment === "whatsapp"} onChange={() => setPayment("whatsapp")} /> WhatsApp üzerinden sipariş ve ödeme desteği</label><a className="whatsapp-order" href={whatsappUrl}>WHATSAPP&apos;TAN SİPARİŞİ GÖNDER</a></div></div>
       </div>
 <aside className="order-summary">

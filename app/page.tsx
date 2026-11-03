@@ -1,4 +1,6 @@
 "use client";
+import HeaderActions from "../components/HeaderActions";
+
 
 import { useState } from "react";
 import Image from "next/image";
@@ -423,33 +425,7 @@ export default function Home() {
             priority
           />
         </a>
-        <div className="store-actions">
-          <button
-            onClick={() =>
-              setActivePanel(activePanel === "search" ? null : "search")
-            }
-            aria-label="Ara"
-          >
-            <HeaderIcon name="search" />
-          </button>
-          <button
-            onClick={() =>
-              setActivePanel(activePanel === "account" ? null : "account")
-            }
-            aria-label="Kullanıcı girişi"
-          >
-            <HeaderIcon name="account" />
-          </button>
-          <button
-            onClick={() =>
-              setActivePanel(activePanel === "cart" ? null : "cart")
-            }
-            aria-label="Sepet"
-          >
-            <HeaderIcon name="cart" />
-            <small>{cartItems.length}</small>
-          </button>
-        </div>
+        <HeaderActions />
         {activePanel === "search" && (
           <div className="header-panel search-panel">
             <label htmlFor="site-search">Ne arıyorsun?</label>

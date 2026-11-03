@@ -1,4 +1,6 @@
 "use client";
+import HeaderActions from "./HeaderActions";
+
 
 import Image from "next/image";
 import Link from "next/link";
@@ -54,18 +56,7 @@ export default function SiteHeader() {
             priority
           />
         </Link>
-        <div className="store-actions" aria-label="Site işlemleri">
-          <button aria-label="Ara">
-            <HeaderIcon name="search" />
-          </button>
-          <Link href="/hesabim" aria-label="Kullanıcı girişi">
-            <HeaderIcon name="account" />
-          </Link>
-          <Link href="/odeme" aria-label="Sepet">
-            <HeaderIcon name="cart" />
-            <small>0</small>
-          </Link>
-        </div>
+        <HeaderActions />
       </header>
       <nav className="collection-nav" aria-label="Ana menü">
         <Link href="/3d-baski">3D Baskı</Link>

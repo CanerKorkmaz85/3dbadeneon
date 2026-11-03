@@ -19,7 +19,7 @@ const emptyAddress: Address = {
 };
 
 export default function AccountPage() {
-  const [tab, setTab] = useState<"login" | "register">("login");
+  const [tab, setTab] = useState<"login" | "register">(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab") === "register" ? "register" : "login");
   const [profile, setProfile] = useState<Profile | null>(() => {
     if (typeof window === "undefined") return null;
     try { return JSON.parse(sessionStorage.getItem("3dbade-account-session") || "null"); } catch { return null; }
