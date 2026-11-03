@@ -1243,6 +1243,7 @@
     ]
   },
   {
+    "id": "d-ner-neon-led-duvar-dekoru-1793708930935",
     "title": "Döner Neon LED Duvar Dekoru",
     "category": "İşletme Neonları",
     "productType": "Neon",
@@ -1276,7 +1277,36 @@
     "mainImage": "/uploads/d-ner-neon-led-duvar-dekoru-1793708930935/ana-1793708930956-bd824j.jpg",
     "hoverImages": [
       "/uploads/d-ner-neon-led-duvar-dekoru-1793708930935/galeri-1-1793708930959-1txdoe.jpg"
+    ]
+  },
+  {
+    "title": "📱 Telefon App Kontrollü Programlanabilir Araba Led Ekranı, Uzaktan kumandalı Kayan Yazı Emoji Led",
+    "category": "Ek Malzemeler",
+    "productType": "Neon",
+    "sizesEnabled": true,
+    "sizeOptions": [
+      {
+        "label": "10,2 × 34,8 cm",
+        "price": "3900"
+      }
     ],
-    "id": "d-ner-neon-led-duvar-dekoru-1793708930935"
+    "remoteEnabled": false,
+    "price30": "",
+    "price40": "",
+    "price50": "",
+    "specialPrice": "Teklif Al",
+    "remoteExtra": "",
+    "description": "<h3>📱 Telefon Uygulama Kontrollü Kayan Yazı ve Emoji LED Ekran</h3><p><strong>Tarzını Işıkla Yansıt! ✨</strong></p><p>Yazılarını, emojilerini ve kişisel mesajlarını ışıkla buluştur! <strong>Uygulama Kontrollü LED Ekran</strong>, kayan yazılar ve hazır şablonlarla sana özel bir görünüm oluşturmanı sağlar.</p><p>Telefon uygulaması üzerinden istediğin yazıyı yazabilir, emojileri değiştirebilir ve hazır şablonlardan seçim yapabilirsin. Kumandasıyla da kontrol edilebilen ekranın görünümünü dilediğin zaman yenileyebilirsin.</p><h3>🛠️ Teknik Özellikler</h3><ul><li><p><strong>Ürün ölçüsü:</strong> 10,2 × 34,8 cm</p></li><li><p><strong>Kontrol:</strong> Telefon uygulaması ve kumanda</p></li><li><p><strong>İçerik seçenekleri:</strong> Kişiselleştirilebilir yazılar, kayan yazılar, emojiler ve hazır şablonlar</p></li><li><p><strong>Ekran yapısı:</strong> Sabit gövdeli, esnek olmayan ekran</p></li></ul><h3>📦 Paket İçeriği</h3><ul><li><p>1 adet LED ekran</p></li><li><p>4 adet yapıştırma bandı</p></li><li><p>1 adet kumanda</p></li><li><p>1 adet güç kablosu</p></li></ul><p><strong>3DBadeNeon ile mesajına ışık kat!</strong></p>",
+    "technical": "",
+    "mainImage": "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/ana-1793715262291-jrc7an.jpg",
+    "hoverImages": [
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-1-1793715262293-5cn9wl.jpg",
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-2-1793715262296-0d0gjw.jpg",
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-3-1793715262298-sxc04m.jpg",
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-4-1793715262300-4ume8h.jpg",
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-5-1793715262304-3z9neq.jpg",
+      "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/galeri-6-1793715262306-kbkt3r.jpg"
+    ],
+    "id": "telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262"
   }
 ]
