@@ -2405,7 +2405,7 @@ a {
   background: #df1620;
   color: #fff;
   font-family: Arial, sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-style: normal;
   font-weight: 900;
   line-height: 1;
@@ -5570,5 +5570,47 @@ a {
   .home-3d-section .venue-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+}
+
+/* Neon LED ürün incele butonu */
+.magaza-page:not(.service-page) .all-product-card > div > button {
+  background: #ff8a16;
+  border-color: #ff8a16;
+  color: #fff;
+}
+.magaza-page:not(.service-page) .all-product-card > div > button:hover {
+  background: #e87508;
+  border-color: #e87508;
+}
+/* 3D Baskı ürün incele butonu */
+.service-page.magaza-page .all-product-card .service-primary-link {
+  float: right;
+  display: inline-block;
+  margin: 0;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: #ff8a16;
+  color: #fff;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: normal;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+.service-page.magaza-page .all-product-card .service-primary-link:hover {
+  background: #e87508;
+}
+@media (max-width: 620px) {
+  .service-page.magaza-page .all-product-card .service-primary-link {
+    float: none;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
   }
 }

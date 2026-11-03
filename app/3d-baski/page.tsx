@@ -70,7 +70,19 @@ export default function ThreeDPrintingPage() {
               const price = startingPrice(product);
               return (
                 <article className="all-product-card" key={product.id}>
-                  <Link href={href} className="all-product-image">
+                  <Link href={href} className="all-product-image" style={{ position: "relative", overflow: "hidden" }}>
+  {price !== null && (
+    <span data-discount-3d style={{
+      position: "absolute", zIndex: 5, top: 16, left: -30,
+      display: "grid", placeItems: "center", width: 126,
+      minHeight: 30, padding: "5px 10px",
+      background: "#df1620", color: "#fff",
+      fontFamily: "Arial, sans-serif", fontSize: 16,
+      fontWeight: 900, lineHeight: 1, letterSpacing: "0.02em",
+      transform: "rotate(-42deg)",
+      boxShadow: "0 3px 9px #31101355", pointerEvents: "none",
+    }}>-%20</span>
+  )}
                     <Image
                       unoptimized
                       className="catalog-image-main"
@@ -95,6 +107,13 @@ export default function ThreeDPrintingPage() {
                     <small>3D Baskı</small>
                     <h2><Link href={href}>{product.title}</Link></h2>
                     <span className="product-price">
+  {price !== null && (
+    <del style={{ color: "#888", fontSize: 14, fontWeight: 400 }}>
+      {(price / 0.8).toLocaleString("tr-TR", {
+        style: "currency", currency: "TRY", maximumFractionDigits: 2
+      })}
+    </del>
+  )}
                       <b>{price ? `₺${price.toLocaleString("tr-TR")}` : "TEKLİF AL"}</b>
                     </span>
                     <Link href={href} className="service-primary-link">

@@ -94,7 +94,18 @@ function handleAddToCart() {
         <div className="product-details">
           <p>{product.category}</p><h1>{product.title}</h1>
           <div className="product-stars"><span>★★★★★</span><small>Yeni ürün · 3Dbade özel seri</small></div>
-          <div className="product-price"><strong>{total ? `₺${total.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong><small>KDV dahil · Ücretsiz kargo</small></div>
+          <div className="product-price">
+  {total !== null && total > 0 && (
+    <span data-discount-example style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+      <del style={{ color: "#888", fontSize: 18, fontWeight: 400 }}>
+        {(total / 0.8).toLocaleString("tr-TR", { style: "currency", currency: "TRY", maximumFractionDigits: 2 })}
+      </del>
+      <span style={{ background: "#df1620", color: "#fff", padding: "5px 8px", borderRadius: 5, fontSize: 12, fontWeight: 700 }}>
+        %20 İNDİRİM
+      </span>
+    </span>
+  )}
+  <strong>{total ? `₺${total.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong><small>KDV dahil · Ücretsiz kargo</small></div>
           {product.sizesEnabled && product.sizeOptions.length > 0 && <div className="product-choice"><b>Boyut <small>{size}</small></b><div>{product.sizeOptions.map((option, index) => <button key={`${option.label}-${index}`} className={size === option.label ? "selected" : ""} onClick={() => setSize(option.label)}>{option.label}</button>)}</div></div>}
           {product.remoteEnabled && <div className="product-choice"><b>Kumanda <small>{remote}</small></b><div>{["Kumandalı", "Kumandasız"].map((option) => <button key={option} className={remote === option ? "selected" : ""} onClick={() => setRemote(option)}>{option}</button>)}</div><small className="remote-price-note">Kumandalı seçeneği: +₺{Number(product.remoteExtra || 0).toLocaleString("tr-TR")}</small></div>}
           <div className="product-actions">

@@ -99,15 +99,34 @@ export default function MagazaPage() {
           <div className="all-product-grid">
             {visibleProducts.map((product) => (
               <article className={`all-product-card ${["Köpek Mc Neon LED Duvar Dekoru", "Fenerbahçe Özel Seri Neon Logo", "Motorcu Kuru Kafa Neon LED"].includes(product.title) ? "dark-card-text" : ""}`} key={product.id}>
-                <Link href={product.href} className="all-product-image">
+                <Link href={product.href} className="all-product-image" style={{ position: "relative", overflow: "hidden" }}>
+  {startingPrice(product) !== null && (
+    <span data-discount-neon style={{
+      position: "absolute", zIndex: 5, top: 16, left: -30,
+      display: "grid", placeItems: "center", width: 126,
+      minHeight: 30, padding: "5px 10px",
+      background: "#df1620", color: "#fff",
+      fontFamily: "Arial, sans-serif", fontSize: 16,
+      fontWeight: 900, lineHeight: 1, letterSpacing: "0.02em",
+      transform: "rotate(-42deg)",
+      boxShadow: "0 3px 9px #31101355", pointerEvents: "none",
+    }}>-%20</span>
+  )}
                   <Image unoptimized className="catalog-image-main" src={product.image} alt={product.title} width={900} height={1100} />
                   {product.hoverImage && <Image unoptimized className="catalog-image-hover" src={product.hoverImage} alt="" aria-hidden="true" width={900} height={1100} />}
                 </Link>
                 <div>
                   <small>{product.category}</small>
                   <h2>{product.title}</h2>
-                  <span className="product-price">{startingPrice(product) ? <><small>Başlangıç</small><b>₺{startingPrice(product)?.toLocaleString("tr-TR")}</b></> : <b>TEKLİF AL</b>}</span>
-                  <button onClick={() => setCartCount((count) => count + 1)}>SEPETE EKLE +</button>
+                  <span className="product-price">
+  {startingPrice(product) !== null && (
+    <del style={{ color: "#888", fontSize: 14, fontWeight: 400 }}>
+      {(startingPrice(product)! / 0.8).toLocaleString("tr-TR", {
+        style: "currency", currency: "TRY", maximumFractionDigits: 2
+      })}
+    </del>
+  )}{startingPrice(product) ? <><small>Başlangıç</small><b>₺{startingPrice(product)?.toLocaleString("tr-TR")}</b></> : <b>TEKLİF AL</b>}</span>
+                  <button onClick={() => window.location.assign(product.href)}>ÜRÜNÜ İNCELE →</button>
                 </div>
               </article>
             ))}

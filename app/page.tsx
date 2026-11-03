@@ -218,46 +218,66 @@ const popArtCollection = [
   },
 ];
 const extraNeonCollection = [
-  {
-    "title": "Waffle Neon LED Duvar Dekoru",
-    "src": "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/ana-1793433559774-8ppmkj.jpg",
-    "href": "/urunler/waffle-neon-led-duvar-dekoru-1793433559756"
-  },
-  {
-    "title": "Çilekli Astronot Neon LED",
-    "src": "/urun-gorselleri/astronot/cilekli/ana.jpg",
-    "href": "/urunler/cilekli-astronot"
-  },
-  {
-    "title": "Astronot Ay Neon LED",
-    "src": "/urun-gorselleri/astronot/ay/ana.jpg",
-    "href": "/urunler/astronot-ay"
-  },
-  {
-    "title": "Astronot Savaşçı Neon LED",
-    "src": "/urun-gorselleri/astronot/savasci/ana.jpg",
-    "href": "/urunler/astronot-savasci"
-  },
-  {
-    "title": "Köpek Patron Neon LED",
-    "src": "/urun-gorselleri/pop-art/kopek-patron/ana.jpg",
-    "href": "/urunler/kopek-patron"
-  },
-  {
-    "title": "Dolar Kesesi Neon LED",
-    "src": "/urun-gorselleri/pop-art/dolar-kesesi/ana.jpg",
-    "href": "/urunler/dolar-kesesi"
-  },
-  {
-    "title": "Gamer Oyun Kolu Neon",
-    "src": "/urun-gorselleri/gamer/oyun-kolu/ana.jfif",
-    "href": "/urunler/gamer-oyun-kolu"
-  },
-  {
-    "title": "Smaç Basan Astronot Neon LED",
-    "src": "/urun-gorselleri/astronot/smac/ana.jpg",
-    "href": "/urunler/smac-astronot"
-  }
+    {
+        "title":  "Waffle Neon LED Duvar Dekoru",
+        "src":  "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/ana-1793433559774-8ppmkj.jpg",
+        "href":  "/urunler/waffle-neon-led-duvar-dekoru-1793433559756"
+    },
+    {
+        "title":  "Çilekli Astronot Neon LED",
+        "src":  "/urun-gorselleri/astronot/cilekli/ana.jpg",
+        "href":  "/urunler/cilekli-astronot"
+    },
+    {
+        "title":  "Astronot Ay Neon LED",
+        "src":  "/urun-gorselleri/astronot/ay/ana.jpg",
+        "href":  "/urunler/astronot-ay"
+    },
+    {
+        "title":  "Astronot Savaşçı Neon LED",
+        "src":  "/urun-gorselleri/astronot/savasci/ana.jpg",
+        "href":  "/urunler/astronot-savasci"
+    },
+    {
+        "title":  "Köpek Patron Neon LED",
+        "src":  "/urun-gorselleri/pop-art/kopek-patron/ana.jpg",
+        "href":  "/urunler/kopek-patron"
+    },
+    {
+        "title":  "Dolar Kesesi Neon LED",
+        "src":  "/urun-gorselleri/pop-art/dolar-kesesi/ana.jpg",
+        "href":  "/urunler/dolar-kesesi"
+    },
+    {
+        "title":  "Gamer Oyun Kolu Neon",
+        "src":  "/urun-gorselleri/gamer/oyun-kolu/ana.jfif",
+        "href":  "/urunler/gamer-oyun-kolu"
+    },
+    {
+        "title":  "Smaç Basan Astronot Neon LED",
+        "src":  "/urun-gorselleri/astronot/smac/ana.jpg",
+        "href":  "/urunler/smac-astronot"
+    },
+    {
+        "title":  "Döner Neon LED Duvar Dekoru",
+        "src":  "/uploads/d-ner-neon-led-duvar-dekoru-1793708930935/ana-1793708930956-bd824j.jpg",
+        "href":  "/urunler/d-ner-neon-led-duvar-dekoru-1793708930935"
+    },
+    {
+        "title":  "📱 Telefon App Kontrollü Programlanabilir Araba Led Ekranı, Uzaktan kumandalı Kayan Yazı Emoji Led",
+        "src":  "/uploads/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262/ana-1793715262291-jrc7an.jpg",
+        "href":  "/urunler/telefon-app-kontroll-programlanabilir-araba-led-ekrani-uzaktan-kumandali-kayan-yazi-emoji-led-1793715262262"
+    },
+    {
+        "title":  "💕 Better Together Neon LED Duvar Dekoru",
+        "src":  "/uploads/better-together-neon-led-duvar-dekoru-1793715879746/ana-1793715879781-8zo4no.jpg",
+        "href":  "/urunler/better-together-neon-led-duvar-dekoru-1793715879746"
+    },
+    {
+        "title":  "Bıyık Neon LED Duvar Dekoru",
+        "src":  "/uploads/biyik-neon-led-duvar-dekoru-1793716353643/ana-1793716353663-17s67y.jpg",
+        "href":  "/urunler/biyik-neon-led-duvar-dekoru-1793716353643"
+    }
 ];
 
 const threeDPrintingCards = [
