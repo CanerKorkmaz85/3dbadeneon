@@ -1035,6 +1035,7 @@
     ]
   },
   {
+    "id": "noel-baba-fig-r-1792705971665",
     "title": "Noel Baba Figürü 🎅✨",
     "category": "3D Maket",
     "productType": "3D Maket",
@@ -1058,8 +1059,7 @@
       "/uploads/noel-baba-fig-r-1792705971665/galeri-1-1792705971681-xd2059.jpg",
       "/uploads/noel-baba-fig-r-1792705971665/galeri-2-1792705971682-ojtc0q.jpg",
       "/uploads/noel-baba-fig-r-1792705971665/galeri-3-1792705971687-8kwlfn.jpg"
-    ],
-    "id": "noel-baba-fig-r-1792705971665"
+    ]
   },
   {
     "id": "paslanmaz-kutu-harf-1792708995313",
@@ -1181,6 +1181,7 @@
     ]
   },
   {
+    "id": "waffle-neon-led-duvar-dekoru-1793433559756",
     "title": "Waffle Neon LED Duvar Dekoru",
     "category": "Takımlar",
     "productType": "Neon",
@@ -1214,10 +1215,10 @@
     "mainImage": "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/ana-1793433559774-8ppmkj.jpg",
     "hoverImages": [
       "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/galeri-1-1793433559779-m1j9cs.jpg"
-    ],
-    "id": "waffle-neon-led-duvar-dekoru-1793433559756"
+    ]
   },
   {
+    "id": "hem-ire-niformasi-tasarimli-kalemlik-1793435467249",
     "title": "Hemşire Üniforması Tasarımlı Kalemlik",
     "category": "3D Maket",
     "productType": "3D Maket",
@@ -1239,7 +1240,43 @@
     "mainImage": "/uploads/hem-ire-niformasi-tasarimli-kalemlik-1793435467249/ana-1793435467262-61gmku.jpg",
     "hoverImages": [
       "/uploads/hem-ire-niformasi-tasarimli-kalemlik-1793435467249/galeri-1-1793435467265-rdr4e8.jpg"
+    ]
+  },
+  {
+    "title": "Döner Neon LED Duvar Dekoru",
+    "category": "İşletme Neonları",
+    "productType": "Neon",
+    "sizesEnabled": true,
+    "sizeOptions": [
+      {
+        "label": "30 cm",
+        "price": "3750"
+      },
+      {
+        "label": "40 cm",
+        "price": "4100"
+      },
+      {
+        "label": "50 cm",
+        "price": "4700"
+      },
+      {
+        "label": "Özel ölçü",
+        "price": "Teklif Al"
+      }
     ],
-    "id": "hem-ire-niformasi-tasarimli-kalemlik-1793435467249"
+    "remoteEnabled": true,
+    "price30": "3750",
+    "price40": "4100",
+    "price50": "4700",
+    "specialPrice": "Teklif Al",
+    "remoteExtra": "250",
+    "description": "<div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><p><strong>&nbsp;Mekânına Lezzetli Bir Görünüm ve Sıcak Bir Işık Kat! 🔥✨</strong></p><p>Döner şişi, çapraz bıçak, alev detayları ve tepsideki kesilmiş döner parçalarıyla tasarlanan <strong>Döner Neon LED Duvar Dekoru</strong>, işletmenizin duvarlarına dikkat çekici bir görünüm kazandırır. Döner üzerindeki altı parçalı amber neon; kırmızı domatesler, beyaz soğan halkaları ve yeşil detaylarla tamamlanır. Alevlerdeki kırmızı ve gün ışığı tonları tasarıma sıcaklık katar.</p><p>Dönerciler, kebap salonları, restoranlar ve büfeler için hazırlanan bu tasarım; sipariş bankosu arkasında, servis bölümünde veya oturma alanında dekorasyonu tamamlar. Yazısız tasarımıyla doğrudan ürünün görseline odaklanır.</p><h3>🛠️ Teknik Özellikler</h3><ul><li><strong>Aydınlatma:</strong> Esnek silikon LED neon.</li><li><strong>Amber detaylar:</strong> Döner üzerinde dağınık yerleştirilmiş altı kısa neon parçası ve tepsideki etlerde ışık vurguları.</li><li><strong>Alevler:</strong> Kırmızı ve gün ışığı neon.</li><li><strong>Garnitürler:</strong> Domateslerde kırmızı, soğan halkalarında beyaz, yeşilliklerde yeşil neon.</li><li><strong>Teknoloji:</strong> Cam neon yerine esnek silikon LED.</li><li><strong>Enerji:</strong> Düşük enerji tüketimi.</li></ul><h3>📍 Kullanım Alanları</h3><ul><li>Dönerci ve kebap salonları</li><li>Restoranlar ve büfeler</li><li>Fast food işletmeleri</li><li>Sipariş ve kasa arkası duvarları</li><li>Servis ve oturma alanları<br><br></li></ul><p><strong>İşletmenizin lezzetini, duvarınızda da öne çıkarın!</strong></p></div></div></div></div></div></div></div></div><div><div>        </div></div></div></div></div></div></div></div></div></div></div><div><div><div></div></div></div><!--EndFragment-->",
+    "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
+    "mainImage": "/uploads/d-ner-neon-led-duvar-dekoru-1793708930935/ana-1793708930956-bd824j.jpg",
+    "hoverImages": [
+      "/uploads/d-ner-neon-led-duvar-dekoru-1793708930935/galeri-1-1793708930959-1txdoe.jpg"
+    ],
+    "id": "d-ner-neon-led-duvar-dekoru-1793708930935"
   }
 ]
