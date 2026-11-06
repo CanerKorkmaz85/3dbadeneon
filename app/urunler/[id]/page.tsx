@@ -5,6 +5,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { TeamCampaignOrder } from "../../../components/TeamCampaign";
+import { productCategories } from "../../../lib/admin-products";
 import FormattedProductCopy from "../../../components/FormattedProductCopy";
 import { createEmptyProduct, normalizeAdminProduct, readAdminProducts, type AdminProduct } from "../../../lib/admin-products";
 import { addToCart } from "../../../lib/cart";
@@ -108,6 +110,7 @@ function handleAddToCart() {
   <strong>{total ? `₺${total.toLocaleString("tr-TR")}` : "TEKLİF AL"}</strong><small>KDV dahil · Ücretsiz kargo</small></div>
           {product.sizesEnabled && product.sizeOptions.length > 0 && <div className="product-choice"><b>Boyut <small>{size}</small></b><div>{product.sizeOptions.map((option, index) => <button key={`${option.label}-${index}`} className={size === option.label ? "selected" : ""} onClick={() => setSize(option.label)}>{option.label}</button>)}</div></div>}
           {product.remoteEnabled && <div className="product-choice"><b>Kumanda <small>{remote}</small></b><div>{["Kumandalı", "Kumandasız"].map((option) => <button key={option} className={remote === option ? "selected" : ""} onClick={() => setRemote(option)}>{option}</button>)}</div><small className="remote-price-note">Kumandalı seçeneği: +₺{Number(product.remoteExtra || 0).toLocaleString("tr-TR")}</small></div>}
+          {product.productType === "Neon" && product.category === productCategories[0] && <TeamCampaignOrder title={product.title} size={size} remote={product.remoteEnabled ? remote : ""} quantity={quantity} total={total} url={`https://3dbadeneon.com/urunler/${product.id}`} />}
           <div className="product-actions">
   <div className="quantity">
     <button onClick={() => setQuantity((value) => Math.max(1, value - 1))}>-</button>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { TeamCampaignBanner } from "../../components/TeamCampaign";
+import { productCategories } from "../../lib/admin-products";
 import Link from "next/link";
 import { normalizeAdminProduct, readAdminProducts, type AdminProduct } from "../../lib/admin-products";
 
@@ -52,13 +54,21 @@ function startingPrice(product: AdminProduct) {
 export default function MagazaPage() {
   const [selectedCategory, setSelectedCategory] = useState(() => {
     if (typeof window === "undefined") return "Tümü";
-    const requested = new URLSearchParams(window.location.search).get("kategori");
+    const raw = new URLSearchParams(window.location.search).get("kategori");
+    const requested = raw === "takimlar" ? productCategories[0] : raw;
     return requested && categories.includes(requested) ? requested : "Tümü";
   });
-  const [, setCartCount] = useState(0);
+
   const [products, setProducts] = useState<AdminProduct[]>(readAdminProducts);
 
   useEffect(() => {
+    const syncCategory = () => {
+      const raw = new URLSearchParams(window.location.search).get("kategori");
+      const requested = raw === "takimlar" ? productCategories[0] : raw;
+      if (requested && categories.includes(requested)) setSelectedCategory(requested);
+    };
+    syncCategory();
+    window.addEventListener("popstate", syncCategory);
     let cancelled = false;
     async function load() {
       try {
@@ -69,7 +79,7 @@ export default function MagazaPage() {
       }
     }
     load();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; window.removeEventListener("popstate", syncCategory); };
   }, []);
 
   const catalogProducts = products.filter((product) => product.productType === "Neon").map((product) => ({
@@ -94,6 +104,7 @@ export default function MagazaPage() {
           ))}
           <button style={{ background: "#000", color: "#fff", borderColor: "#000" }} className={selectedCategory === "Tümü" ? "selected" : ""} onClick={() => setSelectedCategory("Tümü")}>Tümü</button>
         </div>
+        {selectedCategory === productCategories[0] && <TeamCampaignBanner />}
         <div className="all-product-status"><span>{selectedCategory === "Tümü" ? "Tüm ürünler" : selectedCategory}</span><b>{visibleProducts.length} ürün</b></div>
         {visibleProducts.length ? (
           <div className="all-product-grid">
