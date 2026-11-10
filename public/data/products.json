@@ -1181,6 +1181,7 @@
     ]
   },
   {
+    "id": "waffle-neon-led-duvar-dekoru-1793433559756",
     "title": "Waffle Neon LED Duvar Dekoru",
     "category": "Kafe & Restoranlar",
     "productType": "Neon",
@@ -1214,8 +1215,7 @@
     "mainImage": "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/ana-1793433559774-8ppmkj.jpg",
     "hoverImages": [
       "/uploads/waffle-neon-led-duvar-dekoru-1793433559756/galeri-1-1793433559779-m1j9cs.jpg"
-    ],
-    "id": "waffle-neon-led-duvar-dekoru-1793433559756"
+    ]
   },
   {
     "id": "hem-ire-niformasi-tasarimli-kalemlik-1793435467249",
@@ -1372,5 +1372,42 @@
       "/uploads/biyik-neon-led-duvar-dekoru-1793716353643/galeri-6-1793716353674-y8u6pb.jpg",
       "/uploads/biyik-neon-led-duvar-dekoru-1793716353643/galeri-7-1793716353677-gm5pl0.jpg"
     ]
+  },
+  {
+    "title": "Atatürk İmza Neon LED Duvar Dekoru 🇹🇷",
+    "category": "Ev Dekorasyon",
+    "productType": "Neon",
+    "sizesEnabled": true,
+    "sizeOptions": [
+      {
+        "label": "30 cm",
+        "price": "1900"
+      },
+      {
+        "label": "40 cm",
+        "price": "2200"
+      },
+      {
+        "label": "50 cm",
+        "price": "2450"
+      },
+      {
+        "label": "Özel ölçü",
+        "price": "Teklif Al"
+      }
+    ],
+    "remoteEnabled": true,
+    "price30": "1900",
+    "price40": "2200",
+    "price50": "2450",
+    "specialPrice": "Teklif Al",
+    "remoteExtra": "250",
+    "description": "<h3>🇹🇷 Atatürk İmza Neon LED Duvar Dekoru</h3><p><strong>&nbsp;Atatürk’ün İmzasının Işığını Mekânınıza Taşıyın! ✨</strong></p><p>Zamansız bir simgeyi modern neon tasarımla buluşturan <strong>Atatürk İmza Neon LED Duvar Dekoru</strong>, sıcak beyaz ışığı ve zarif imza çizgisiyle bulunduğu her alana anlamlı bir karakter kazandırır. Evlerde, ofislerde, çalışma odalarında, kafe ve işletme duvarlarında; sade ama güçlü bir dekoratif etki oluşturmak isteyenler için özel olarak tasarlanmıştır.</p><p>Geleneksel cam neonların aksine kırılma riski taşımayan, ısınmayan ve düşük enerji tüketen esnek silikon LED teknolojisiyle üretilir. Duvarınızda hem şık hem de anlamlı bir ışık detayı yaratır.</p><h3>🛠️ Teknik Özellikler</h3><ul><li><p><strong>Tasarım:</strong> Atatürk imzasından ilham alan özel neon tasarım.</p></li><li><p><strong>Aydınlatma Teknolojisi:</strong> Esnek silikon Neon LED.</p></li><li><p><strong>Işık Rengi:</strong> Sıcak beyaz.</p></li><li><p><strong>Kullanım Alanı:</strong> Ev, ofis, çalışma odası, kafe ve işletmeler için uygundur.</p></li><li><p><strong>Enerji Tüketimi:</strong> Düşük enerji tüketimli LED teknolojisi.</p></li><li><p><strong>Güvenlik:</strong> Cam neon değildir; ısınma ve kırılma riski oluşturmaz.</p></li><li><p><strong>Çalışma Sistemi:</strong> Adaptör ile prize takılarak kullanılır.</p></li></ul><h3>✨ Neden Atatürk İmza Neon?</h3><ul><li><p><strong>Anlamlı Tasarım:</strong> Atatürk’ün imzasını modern ve estetik bir dekor objesine dönüştürür.</p></li><li><p><strong>Zarif Işık Etkisi:</strong> Sıcak beyaz ışığıyla mekânı yormadan dikkat çeken bir atmosfer oluşturur.</p></li><li><p><strong>Özel Hediye Seçeneği:</strong> Öğretmenler, ofisler, sevdikleriniz ve özel günler için kalıcı bir armağandır.</p></li><li><p><strong>Dekoratif Uyum:</strong> Modern, klasik veya endüstriyel mekânlara kolayca uyum sağlar.</p></li></ul><h3>📦 Paket İçeriği</h3><ol><li><p>Atatürk İmza Neon LED Duvar Dekoru</p></li><li><p>Güç adaptörü</p></li></ol><blockquote><p><strong><em>Işığınla iz bırak. 🇹🇷</em></strong><br>Atatürk’ün imzasını taşıyan bu özel neon tasarım, duvarınıza yalnızca ışık değil; anlam ve karakter de katar.</p></blockquote>",
+    "technical": "Ölçü\n30, 40, 50 cm veya özel ölçü\n\nMalzeme\n4 mm şeffaf, kontur kesim pleksi\n\nAydınlatma\n12V esnek silikon neon LED\n\nKablo\nYaklaşık 2 metre\n\nPaket içeriği\nNeon dekor ve 12V adaptör",
+    "mainImage": "/uploads/atat-rk-imza-neon-led-duvar-dekoru-1794321320771/ana-1794321320845-q1wf2g.jpg",
+    "hoverImages": [
+      "/uploads/atat-rk-imza-neon-led-duvar-dekoru-1794321320771/galeri-1-1794321320848-fadokq.jpg"
+    ],
+    "id": "atat-rk-imza-neon-led-duvar-dekoru-1794321320771"
   }
 ]
